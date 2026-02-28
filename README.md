@@ -24,6 +24,26 @@ Xcode stores breakpoints in a file called `Breakpoints_v2.xcbkptlist` inside you
 
 ### Build from source
 
+**First, make sure `xcode-select` points at your Xcode installation, not the standalone Command Line Tools:**
+
+```sh
+xcode-select -p
+```
+
+If the output is `/Library/Developer/CommandLineTools`, you need to switch it to Xcode (this is a one-time step):
+
+```sh
+sudo xcode-select --switch /Applications/Xcode.app
+```
+
+Replace `Xcode.app` with the name of your installed Xcode if it differs (e.g. `Xcode_26.3.app`). You can see what's in `/Applications` with:
+
+```sh
+ls /Applications | grep Xcode
+```
+
+Once `xcode-select` points at Xcode, build normally:
+
 ```sh
 git clone https://github.com/coveloper/xmark.git
 cd xmark
@@ -37,11 +57,6 @@ Verify it worked:
 xmark --version
 # 0.1.0
 ```
-
-> **Note for Xcode 26 users:** If the build fails with a PackageDescription linker error, set `DEVELOPER_DIR` explicitly:
-> ```sh
-> DEVELOPER_DIR=/Applications/Xcode_26.3.app/Contents/Developer swift build -c release
-> ```
 
 ---
 
