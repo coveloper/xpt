@@ -10,6 +10,17 @@ When you switch git branches, Xcode breakpoints stay anchored to line numbers fr
 
 Xcode stores breakpoints in a file called `Breakpoints_v2.xcbkptlist` inside your project's `xcuserdata` directory. xmark copies that file in and out of `~/.xmark/` keyed by repo and branch name. No Xcode plugin, no LLDB scripting — just file copies triggered by a git hook.
 
+The breakpoint file location depends on your Xcode version:
+
+| Xcode version | Breakpoint file path |
+|---|---|
+| Xcode 26+ | `MyApp.xcodeproj/xcuserdata/<user>.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist` |
+| Xcode 15 and earlier | `MyApp.xcodeproj/xcuserdata/<user>.xcuserdatad/Breakpoints_v2.xcbkptlist` |
+
+xmark detects which path is in use automatically — it checks for the `xcdebugger/` path first and falls back to the legacy path if it doesn't exist.
+
+Because Xcode loads breakpoints at project-open time and does not watch the file for external changes, xmark uses AppleScript to close and reopen your project after each restore. This makes the new breakpoints appear immediately without any manual steps.
+
 ---
 
 ## Requirements
