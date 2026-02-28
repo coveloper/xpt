@@ -1,4 +1,5 @@
 import ArgumentParser
+import Foundation
 
 struct Config: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -9,6 +10,30 @@ struct Config: ParsableCommand {
     var set: String?
 
     func run() throws {
-        print("config: not yet implemented")
+        let repoRoot = try GitUtilities.repoRoot()
+        var config = try RepoConfig.load(from: repoRoot)
+
+        if let assignment = set {
+            // Parse key=value
+            let parts = assignment.split(separator: "=", maxSplits: 1)
+            guard parts.count == 2 else {
+                throw ConfigError.invalidFormat(assignment)
+            }
+            let key = String(parts[0])
+            let value = String(parts[1])
+
+            try config.set(key: key, value: value)
+            try config.save(to: repoRoot)
+            print("xmark: Set \(key) = \(value)")
+        } else {
+            // Display current config
+            let configPath = RepoConfig.configURL(repoRoot: repoRoot)
+            if FileManager.default.fileExists(atPath: configPath.path) {
+                print("Config at \(configPath.path):\n")
+            } else {
+                print("No .xmark config file found. Using defaults:\n")
+            }
+            print(try config.prettyPrinted())
+        }
     }
 }
