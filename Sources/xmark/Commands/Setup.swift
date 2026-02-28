@@ -48,47 +48,78 @@ struct Setup: ParsableCommand {
         print("Run 'xmark setup' again in any other repo you want to enable.")
     }
 
+    private func xcodeVersion() -> Int? {
+        guard let output = try? GitUtilities.run("xcodebuild", "-version") else { return nil }
+        let firstLine = output.components(separatedBy: "\n").first ?? ""
+        guard firstLine.hasPrefix("Xcode ") else { return nil }
+        let versionStr = String(firstLine.dropFirst("Xcode ".count))
+        return Int(versionStr.components(separatedBy: ".").first ?? "")
+    }
+
     private func configureGitignore(repoRoot: URL) throws {
         let gitignorePath = repoRoot.appendingPathComponent(".gitignore")
         let fileExists = FileManager.default.fileExists(atPath: gitignorePath.path)
         let existing = (try? String(contentsOf: gitignorePath, encoding: .utf8)) ?? ""
         let lines = existing.components(separatedBy: "\n")
 
-        let needsXcuserdata = !lines.contains(where: { $0.contains("xcuserdata") })
+        let version = xcodeVersion()
+        let wantsNew    = version == nil || version! >= 16
+        let wantsLegacy = version == nil || version! < 16
+
+        // If any xcuserdata entry already exists, treat it as sufficient
+        let hasBroadXcuserdata = lines.contains(where: { $0.contains("xcuserdata") })
+        let hasNewPattern    = lines.contains("**/xcuserdata/*/xcdebugger/Breakpoints_v2.xcbkptlist")
+        let hasLegacyPattern = lines.contains("**/xcuserdata/*/Breakpoints_v2.xcbkptlist")
         let needsXmarkConfig = !lines.contains(where: { $0.trimmingCharacters(in: .whitespaces) == ".xmark" })
 
-        if needsXcuserdata || needsXmarkConfig {
+        let needsNew    = !hasBroadXcuserdata && wantsNew    && !hasNewPattern
+        let needsLegacy = !hasBroadXcuserdata && wantsLegacy && !hasLegacyPattern
+
+        if needsNew || needsLegacy || needsXmarkConfig {
             var updated = existing
             if !updated.hasSuffix("\n") && !updated.isEmpty { updated += "\n" }
-            updated += "\n# xmark\n"
-            if needsXcuserdata { updated += "xcuserdata/\n" }
-            if needsXmarkConfig { updated += ".xmark\n" }
+            if needsNew {
+                updated += "\n# xmark — per-branch breakpoints (Xcode 16+)\n"
+                updated += "**/xcuserdata/*/xcdebugger/Breakpoints_v2.xcbkptlist\n"
+            }
+            if needsLegacy {
+                updated += "\n# xmark — per-branch breakpoints (Xcode 15 and earlier)\n"
+                updated += "**/xcuserdata/*/Breakpoints_v2.xcbkptlist\n"
+            }
+            if needsXmarkConfig {
+                updated += "\n# xmark — per-repo config\n"
+                updated += ".xmark\n"
+            }
             try updated.write(to: gitignorePath, atomically: true, encoding: .utf8)
 
             if !fileExists {
-                print("xmark: Created .gitignore with xcuserdata/ and .xmark")
+                print("xmark: Created .gitignore with xmark entries")
             } else {
-                var added: [String] = []
-                if needsXcuserdata { added.append("xcuserdata/") }
-                if needsXmarkConfig { added.append(".xmark") }
-                print("xmark: Added \(added.joined(separator: " and ")) to .gitignore")
+                print("xmark: Added xmark entries to .gitignore")
             }
         }
 
         // Warn about already-tracked files that should be untracked
         let tracked = (try? GitUtilities.run("git", "ls-files", "--cached")) ?? ""
         let trackedLines = tracked.components(separatedBy: "\n")
-        let hasTrackedXcuserdata = trackedLines.contains(where: { $0.contains("xcuserdata/") })
+        let trackedBreakpoints = trackedLines.filter {
+            $0.hasSuffix("Breakpoints_v2.xcbkptlist") && $0.contains("xcuserdata/")
+        }
         let hasTrackedXmarkConfig = trackedLines.contains(where: { $0 == ".xmark" })
 
-        if hasTrackedXcuserdata || hasTrackedXmarkConfig {
-            var paths: [String] = []
-            if hasTrackedXcuserdata { paths.append("'*/xcuserdata/*'") }
-            if hasTrackedXmarkConfig { paths.append(".xmark") }
+        if !trackedBreakpoints.isEmpty || hasTrackedXmarkConfig {
+            var rmPaths: [String] = []
+            if trackedBreakpoints.contains(where: { $0.contains("xcdebugger/") }) {
+                rmPaths.append("'*/xcuserdata/*/xcdebugger/Breakpoints_v2.xcbkptlist'")
+            }
+            if trackedBreakpoints.contains(where: { !$0.contains("xcdebugger/") }) {
+                rmPaths.append("'*/xcuserdata/*/Breakpoints_v2.xcbkptlist'")
+            }
+            if hasTrackedXmarkConfig { rmPaths.append(".xmark") }
             print("""
             xmark: Some files xmark manages are tracked by git. Run this to untrack them:
 
-                git rm --cached -r \(paths.joined(separator: " "))
+                git rm --cached -r \(rmPaths.joined(separator: " "))
 
             Then commit the result so your team inherits the gitignore rules.
             """)
