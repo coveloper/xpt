@@ -1,4 +1,5 @@
 import ArgumentParser
+import Foundation
 
 struct Delete: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -9,6 +10,10 @@ struct Delete: ParsableCommand {
     var branch: String
 
     func run() throws {
-        print("delete: not yet implemented")
+        let repoRoot = try GitUtilities.repoRoot()
+        let storage = try StorageManager(repoRoot: repoRoot)
+
+        try storage.delete(branch: branch)
+        print("xmark: Deleted saved breakpoints for branch '\(branch)'.")
     }
 }
