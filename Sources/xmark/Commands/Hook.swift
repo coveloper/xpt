@@ -55,6 +55,9 @@ struct Hook: ParsableCommand {
                 break // leave existing file untouched
             }
         }
+
+        // 3. Reload Xcode project so it picks up the new breakpoint file
+        XcodeUtilities.reloadProject(projectURL: projectURL)
     }
 
     // MARK: - Previous branch resolution

@@ -112,9 +112,11 @@ xmark save
 git checkout feature/my-feature
 ```
 
-If the hook is installed, xmark runs automatically at this point. You'll see no output during the switch — xmark is silent on success. If `feature/my-feature` has no saved breakpoints yet, xmark clears the breakpoint file (the default behavior) or leaves it alone, depending on your `onEmptyBranch` setting.
+If the hook is installed, xmark runs automatically at this point — it saves your `main` breakpoints, restores any saved breakpoints for `feature/my-feature`, and reloads the Xcode project so the change takes effect immediately. Xcode will close and reopen your project; this is normal.
 
-### 4. Open Xcode
+If `feature/my-feature` has no saved breakpoints yet, xmark clears the breakpoint file (the default behavior) or leaves it alone, depending on your `onEmptyBranch` setting.
+
+### 4. Set breakpoints for the new branch
 
 Your breakpoints from `main` should be gone. Add some new breakpoints that make sense for this feature branch.
 
@@ -124,7 +126,7 @@ Your breakpoints from `main` should be gone. Add some new breakpoints that make 
 git checkout main
 ```
 
-xmark automatically saves `feature/my-feature`'s breakpoints and restores `main`'s breakpoints. Open Xcode — your original breakpoints should be back exactly where you left them.
+xmark automatically saves `feature/my-feature`'s breakpoints, restores `main`'s breakpoints, and reloads Xcode. Your original breakpoints should be back exactly where you left them.
 
 ### 6. Confirm what's stored
 
@@ -191,7 +193,7 @@ xmark restore --branch main
 
 If no snapshot exists for the branch, xmark applies your `onEmptyBranch` policy (see Configuration below).
 
-> **Xcode open?** xmark will warn you if Xcode is running when you restore. Xcode may not pick up the change until it's restarted, though in practice it often does reload the file automatically.
+If Xcode is open, xmark automatically closes and reopens your project so the restored breakpoints take effect immediately. Any active debug session will be terminated — this is expected when switching branches.
 
 ---
 
@@ -331,8 +333,8 @@ Xcode hasn't created the breakpoint file yet. Open Xcode, set at least one break
 
 1. Confirm the hook is installed: `cat .git/hooks/post-checkout`
 2. Confirm `xmark` is in your PATH: `which xmark`
-3. Try a manual restore to confirm the snapshot exists: `xmark restore`
-4. If Xcode is open, close and reopen it — Xcode may not pick up file changes while running.
+3. Try a manual restore: `xmark restore` — this also reloads Xcode automatically if it's open
+4. If Xcode didn't reopen automatically, close and reopen it manually
 
 **Branch switched but nothing happened**
 

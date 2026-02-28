@@ -18,8 +18,6 @@ struct Restore: ParsableCommand {
         let targetBranch = try branch ?? GitUtilities.currentBranch()
         let storage = try StorageManager(repoRoot: repoRoot)
 
-        warnIfXcodeRunning()
-
         do {
             try storage.restore(to: breakpointFile, branch: targetBranch)
             print("xmark: Breakpoints restored for branch '\(targetBranch)'.")
@@ -32,12 +30,10 @@ struct Restore: ParsableCommand {
                 print("xmark: No saved breakpoints for '\(targetBranch)' — preserving existing breakpoints.")
             }
         }
-    }
 
-    private func warnIfXcodeRunning() {
-        let result = try? GitUtilities.run("pgrep", "-x", "Xcode")
-        if result != nil && !result!.isEmpty {
-            print("xmark warning: Xcode is currently open. You may need to restart Xcode for restored breakpoints to take effect.")
+        if XcodeUtilities.isRunning {
+            print("xmark: Reloading Xcode project...")
+            XcodeUtilities.reloadProject(projectURL: projectURL)
         }
     }
 }
