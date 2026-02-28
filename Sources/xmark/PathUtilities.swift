@@ -65,10 +65,30 @@ enum PathUtilities {
     // MARK: - Breakpoint file path
 
     /// Returns the path to Breakpoints_v2.xcbkptlist inside the given project file.
+    ///
+    /// Xcode 16+ stores breakpoints in xcuserdata/<user>.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist.
+    /// Older versions used xcuserdata/<user>.xcuserdatad/Breakpoints_v2.xcbkptlist directly.
+    /// This function checks for the newer path first and falls back to the legacy path.
     static func breakpointFileURL(projectURL: URL) -> URL {
-        projectURL
+        let userDataDir = projectURL
             .appendingPathComponent("xcuserdata")
             .appendingPathComponent("\(username).xcuserdatad")
+
+        let newPath = userDataDir
+            .appendingPathComponent("xcdebugger")
             .appendingPathComponent("Breakpoints_v2.xcbkptlist")
+
+        let legacyPath = userDataDir
+            .appendingPathComponent("Breakpoints_v2.xcbkptlist")
+
+        // Prefer the newer xcdebugger/ path if it exists; fall back to legacy
+        if FileManager.default.fileExists(atPath: newPath.path) {
+            return newPath
+        }
+        if FileManager.default.fileExists(atPath: legacyPath.path) {
+            return legacyPath
+        }
+        // Neither exists yet — default to the newer path so xmark creates it in the right place
+        return newPath
     }
 }
