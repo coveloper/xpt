@@ -86,12 +86,6 @@ xmark config --set project=MyApp.xcworkspace
 
 If your repo contains exactly one `.xcworkspace` or `.xcodeproj` at the root, you can skip this step — xmark will find it automatically.
 
-Add `.xmark` to your `.gitignore` so the config file stays local to your machine:
-
-```sh
-echo ".xmark" >> .gitignore
-```
-
 ### Step 2 — Install the git hook
 
 ```sh
@@ -155,11 +149,13 @@ xmark list
 
 ### `xmark setup`
 
-Installs a `post-checkout` git hook in the current repo.
+Installs a `post-checkout` git hook in the current repo and updates `.gitignore` with targeted entries for `Breakpoints_v2.xcbkptlist` and `.xmark`.
 
 ```sh
 xmark setup
 ```
+
+The gitignore entries are version-aware: xmark detects your installed Xcode and adds the appropriate path pattern (Xcode 16+ uses `xcdebugger/Breakpoints_v2.xcbkptlist`; earlier versions use the legacy path). If `xcodebuild` is unavailable, both patterns are added. Re-running `xmark setup` is safe — it won't add duplicate entries.
 
 If a `post-checkout` hook already exists (from Lefthook, Husky, etc.), xmark will not overwrite it. Instead, it prints the line you need to add manually:
 
@@ -260,7 +256,7 @@ xmark config --set onEmptyBranch=preserve
 
 ## Configuration
 
-The `.xmark` file at your repo root controls per-repo behaviour. It is created by `xmark config --set` and should be added to `.gitignore` — it contains machine-specific settings.
+The `.xmark` file at your repo root controls per-repo behaviour. It is created by `xmark config --set` and contains machine-specific settings. `xmark setup` adds it to `.gitignore` automatically.
 
 | Key | Values | Default | Description |
 |---|---|---|---|
