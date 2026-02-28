@@ -1,4 +1,5 @@
 import ArgumentParser
+import Foundation
 
 struct Save: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -9,6 +10,21 @@ struct Save: ParsableCommand {
     var branch: String?
 
     func run() throws {
-        print("save: not yet implemented")
+        let repoRoot = try GitUtilities.repoRoot()
+        let config = try RepoConfig.load(from: repoRoot)
+        let projectURL = try PathUtilities.projectURL(repoRoot: repoRoot, configuredProject: config.project)
+        let breakpointFile = PathUtilities.breakpointFileURL(projectURL: projectURL)
+
+        guard FileManager.default.fileExists(atPath: breakpointFile.path) else {
+            print("xmark save: No breakpoint file found at \(breakpointFile.path)")
+            print("Open Xcode and set at least one breakpoint to create the file.")
+            throw ExitCode.failure
+        }
+
+        let targetBranch = try branch ?? GitUtilities.currentBranch()
+        let storage = try StorageManager(repoRoot: repoRoot)
+        try storage.save(from: breakpointFile, branch: targetBranch)
+
+        print("xmark: Breakpoints saved for branch '\(targetBranch)'.")
     }
 }
