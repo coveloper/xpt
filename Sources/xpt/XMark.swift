@@ -1,9 +1,9 @@
 import ArgumentParser
 
 @main
-struct XMark: ParsableCommand {
+struct Xpt: ParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "xmark",
+        commandName: "xpt",
         abstract: "Save and restore per-branch Xcode breakpoints.",
         version: "0.1.0",
         subcommands: [

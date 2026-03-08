@@ -3,7 +3,7 @@ import Foundation
 
 struct Config: ParsableCommand {
     static let configuration = CommandConfiguration(
-        abstract: "Display or edit the repo-level .xmark configuration."
+        abstract: "Display or edit the repo-level .xpt configuration."
     )
 
     @Option(name: .long, help: "Set a config value, e.g. --set onEmptyBranch=preserve")
@@ -24,14 +24,14 @@ struct Config: ParsableCommand {
 
             try config.set(key: key, value: value)
             try config.save(to: repoRoot)
-            print("xmark: Set \(key) = \(value)")
+            print("xpt: Set \(key) = \(value)")
         } else {
             // Display current config
             let configPath = RepoConfig.configURL(repoRoot: repoRoot)
             if FileManager.default.fileExists(atPath: configPath.path) {
                 print("Config at \(configPath.path):\n")
             } else {
-                print("No .xmark config file found. Using defaults:\n")
+                print("No .xpt config file found. Using defaults:\n")
             }
             print(try config.prettyPrinted())
         }

@@ -34,7 +34,7 @@ struct RepoConfig: Codable {
     }
 
     static func configURL(repoRoot: URL) -> URL {
-        repoRoot.appendingPathComponent(".xmark")
+        repoRoot.appendingPathComponent(".xpt")
     }
 
     // MARK: - Key-value setting

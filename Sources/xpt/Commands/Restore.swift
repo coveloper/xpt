@@ -20,19 +20,19 @@ struct Restore: ParsableCommand {
 
         do {
             try storage.restore(to: breakpointFile, branch: targetBranch)
-            print("xmark: Breakpoints restored for branch '\(targetBranch)'.")
+            print("xpt: Breakpoints restored for branch '\(targetBranch)'.")
         } catch StorageError.noSnapshotFound {
             switch config.effectiveOnEmptyBranch {
             case .clear:
                 try storage.clearBreakpoints(at: breakpointFile)
-                print("xmark: No saved breakpoints for '\(targetBranch)' — cleared breakpoint file.")
+                print("xpt: No saved breakpoints for '\(targetBranch)' — cleared breakpoint file.")
             case .preserve:
-                print("xmark: No saved breakpoints for '\(targetBranch)' — preserving existing breakpoints.")
+                print("xpt: No saved breakpoints for '\(targetBranch)' — preserving existing breakpoints.")
             }
         }
 
         if XcodeUtilities.isRunning {
-            print("xmark: Reloading Xcode project...")
+            print("xpt: Reloading Xcode project...")
             XcodeUtilities.reloadProject(projectURL: projectURL)
         }
     }

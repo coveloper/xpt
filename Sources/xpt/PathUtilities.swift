@@ -8,9 +8,9 @@ enum PathError: Error, CustomStringConvertible {
     var description: String {
         switch self {
         case .noProjectFound:
-            return "No .xcworkspace or .xcodeproj found in the repo root. Run 'xmark config --set project=MyApp.xcworkspace' to configure one."
+            return "No .xcworkspace or .xcodeproj found in the repo root. Run 'xpt config --set project=MyApp.xcworkspace' to configure one."
         case .multipleProjectsFound(let names):
-            return "Multiple Xcode projects found: \(names.joined(separator: ", ")). Run 'xmark config --set project=<name>' to specify which to use."
+            return "Multiple Xcode projects found: \(names.joined(separator: ", ")). Run 'xpt config --set project=<name>' to specify which to use."
         case .breakpointFileNotFound(let path):
             return "Breakpoint file not found at: \(path)"
         }
@@ -88,7 +88,7 @@ enum PathUtilities {
         if FileManager.default.fileExists(atPath: legacyPath.path) {
             return legacyPath
         }
-        // Neither exists yet — default to the newer path so xmark creates it in the right place
+        // Neither exists yet — default to the newer path so xpt creates it in the right place
         return newPath
     }
 }

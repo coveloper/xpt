@@ -16,7 +16,7 @@ struct Save: ParsableCommand {
         let breakpointFile = PathUtilities.breakpointFileURL(projectURL: projectURL)
 
         guard FileManager.default.fileExists(atPath: breakpointFile.path) else {
-            print("xmark save: No breakpoint file found at \(breakpointFile.path)")
+            print("xpt save: No breakpoint file found at \(breakpointFile.path)")
             print("Open Xcode and set at least one breakpoint to create the file.")
             throw ExitCode.failure
         }
@@ -25,6 +25,6 @@ struct Save: ParsableCommand {
         let storage = try StorageManager(repoRoot: repoRoot)
         try storage.save(from: breakpointFile, branch: targetBranch)
 
-        print("xmark: Breakpoints saved for branch '\(targetBranch)'.")
+        print("xpt: Breakpoints saved for branch '\(targetBranch)'.")
     }
 }

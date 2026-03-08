@@ -20,7 +20,7 @@ struct StorageManager {
     init(repoRoot: URL) throws {
         let identifier = Self.repoIdentifier(repoRoot: repoRoot)
         let base = URL(fileURLWithPath: NSHomeDirectory())
-            .appendingPathComponent(".xmark")
+            .appendingPathComponent(".xpt")
             .appendingPathComponent(identifier)
         try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
         self.repoDirectory = base

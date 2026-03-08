@@ -14,6 +14,6 @@ struct Delete: ParsableCommand {
         let storage = try StorageManager(repoRoot: repoRoot)
 
         try storage.delete(branch: branch)
-        print("xmark: Deleted saved breakpoints for branch '\(branch)'.")
+        print("xpt: Deleted saved breakpoints for branch '\(branch)'.")
     }
 }

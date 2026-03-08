@@ -8,10 +8,10 @@ struct Setup: ParsableCommand {
 
     static let hookScript = """
     #!/bin/sh
-    xmark _hook post-checkout "$1" "$2" "$3"
+    xpt _hook post-checkout "$1" "$2" "$3"
     """
 
-    static let hookSnippet = #"xmark _hook post-checkout "$1" "$2" "$3""#
+    static let hookSnippet = #"xpt _hook post-checkout "$1" "$2" "$3""#
 
     func run() throws {
         let repoRoot = try GitUtilities.repoRoot()
@@ -27,8 +27,8 @@ struct Setup: ParsableCommand {
 
         if FileManager.default.fileExists(atPath: hookPath.path) {
             print("""
-            xmark setup: A post-checkout hook already exists at .git/hooks/post-checkout.
-            Add the following line to your existing hook to enable xmark:
+            xpt setup: A post-checkout hook already exists at .git/hooks/post-checkout.
+            Add the following line to your existing hook to enable xpt:
 
                 \(Self.hookSnippet)
             """)
@@ -44,8 +44,8 @@ struct Setup: ParsableCommand {
             ofItemAtPath: hookPath.path
         )
 
-        print("xmark: post-checkout hook installed at .git/hooks/post-checkout")
-        print("Run 'xmark setup' again in any other repo you want to enable.")
+        print("xpt: post-checkout hook installed at .git/hooks/post-checkout")
+        print("Run 'xpt setup' again in any other repo you want to enable.")
     }
 
     private func xcodeVersion() -> Int? {
@@ -70,7 +70,7 @@ struct Setup: ParsableCommand {
         let hasBroadXcuserdata = lines.contains(where: { $0.contains("xcuserdata") })
         let hasNewPattern    = lines.contains("**/xcuserdata/*/xcdebugger/Breakpoints_v2.xcbkptlist")
         let hasLegacyPattern = lines.contains("**/xcuserdata/*/Breakpoints_v2.xcbkptlist")
-        let needsXmarkConfig = !lines.contains(where: { $0.trimmingCharacters(in: .whitespaces) == ".xmark" })
+        let needsXmarkConfig = !lines.contains(where: { $0.trimmingCharacters(in: .whitespaces) == ".xpt" })
 
         let needsNew    = !hasBroadXcuserdata && wantsNew    && !hasNewPattern
         let needsLegacy = !hasBroadXcuserdata && wantsLegacy && !hasLegacyPattern
@@ -79,23 +79,23 @@ struct Setup: ParsableCommand {
             var updated = existing
             if !updated.hasSuffix("\n") && !updated.isEmpty { updated += "\n" }
             if needsNew {
-                updated += "\n# xmark — per-branch breakpoints (Xcode 16+)\n"
+                updated += "\n# xpt — per-branch breakpoints (Xcode 16+)\n"
                 updated += "**/xcuserdata/*/xcdebugger/Breakpoints_v2.xcbkptlist\n"
             }
             if needsLegacy {
-                updated += "\n# xmark — per-branch breakpoints (Xcode 15 and earlier)\n"
+                updated += "\n# xpt — per-branch breakpoints (Xcode 15 and earlier)\n"
                 updated += "**/xcuserdata/*/Breakpoints_v2.xcbkptlist\n"
             }
             if needsXmarkConfig {
-                updated += "\n# xmark — per-repo config\n"
-                updated += ".xmark\n"
+                updated += "\n# xpt — per-repo config\n"
+                updated += ".xpt\n"
             }
             try updated.write(to: gitignorePath, atomically: true, encoding: .utf8)
 
             if !fileExists {
-                print("xmark: Created .gitignore with xmark entries")
+                print("xpt: Created .gitignore with xpt entries")
             } else {
-                print("xmark: Added xmark entries to .gitignore")
+                print("xpt: Added xpt entries to .gitignore")
             }
         }
 
@@ -105,7 +105,7 @@ struct Setup: ParsableCommand {
         let trackedBreakpoints = trackedLines.filter {
             $0.hasSuffix("Breakpoints_v2.xcbkptlist") && $0.contains("xcuserdata/")
         }
-        let hasTrackedXmarkConfig = trackedLines.contains(where: { $0 == ".xmark" })
+        let hasTrackedXmarkConfig = trackedLines.contains(where: { $0 == ".xpt" })
 
         if !trackedBreakpoints.isEmpty || hasTrackedXmarkConfig {
             var rmPaths: [String] = []
@@ -115,9 +115,9 @@ struct Setup: ParsableCommand {
             if trackedBreakpoints.contains(where: { !$0.contains("xcdebugger/") }) {
                 rmPaths.append("'*/xcuserdata/*/Breakpoints_v2.xcbkptlist'")
             }
-            if hasTrackedXmarkConfig { rmPaths.append(".xmark") }
+            if hasTrackedXmarkConfig { rmPaths.append(".xpt") }
             print("""
-            xmark: Some files xmark manages are tracked by git. Run this to untrack them:
+            xpt: Some files xpt manages are tracked by git. Run this to untrack them:
 
                 git rm --cached -r \(rmPaths.joined(separator: " "))
 
