@@ -26,7 +26,7 @@ sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
 
 ```
 Sources/xpt/
-  XMark.swift              # @main entry point, registers all subcommands
+  Xpt.swift                # @main entry point, registers all subcommands
   Commands/
     Setup.swift            # xpt setup
     Save.swift             # xpt save
