@@ -104,28 +104,21 @@ This section walks through a complete example so you can verify everything is wo
 
 Set a few breakpoints in your code on your current branch (`main` or whatever you're on). Make them distinctive — for example, put one on a specific line in your `AppDelegate` or main view.
 
-### 2. Save your current branch's breakpoints manually
-
-```sh
-xpt save
-# xpt: Breakpoints saved for branch 'main'.
-```
-
-### 3. Switch to another branch
+### 2. Switch to another branch
 
 ```sh
 git checkout feature/my-feature
 ```
 
-If the hook is installed, xpt runs automatically at this point — it saves your `main` breakpoints, restores any saved breakpoints for `feature/my-feature`, and reloads the Xcode project so the change takes effect immediately. Xcode will close and reopen your project; this is normal.
+xpt runs automatically at this point — it saves your `main` breakpoints, restores any saved breakpoints for `feature/my-feature`, and reloads the Xcode project so the change takes effect immediately. Xcode will close and reopen your project; this is normal.
 
 If `feature/my-feature` has no saved breakpoints yet, xpt clears the breakpoint file (the default behavior) or leaves it alone, depending on your `onEmptyBranch` setting.
 
-### 4. Set breakpoints for the new branch
+### 3. Set breakpoints for the new branch
 
 Your breakpoints from `main` should be gone. Add some new breakpoints that make sense for this feature branch.
 
-### 5. Switch back to main
+### 4. Switch back to main
 
 ```sh
 git checkout main
@@ -133,7 +126,7 @@ git checkout main
 
 xpt automatically saves `feature/my-feature`'s breakpoints, restores `main`'s breakpoints, and reloads Xcode. Your original breakpoints should be back exactly where you left them.
 
-### 6. Confirm what's stored
+### 5. Confirm what's stored
 
 ```sh
 xpt list
