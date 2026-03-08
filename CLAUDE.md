@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-**xmark** — MIT licensed, hosted at [coveloper/xmark](https://github.com/coveloper/xmark).
+**xpt** — MIT licensed, hosted at [coveloper/xpt](https://github.com/coveloper/xpt).
 
 A Swift CLI tool that saves and restores per-branch Xcode breakpoints via git hooks.
 
@@ -14,7 +14,7 @@ A Swift CLI tool that saves and restores per-branch Xcode breakpoints via git ho
 
 ```sh
 DEVELOPER_DIR=/Applications/Xcode_26.3.app/Contents/Developer swift build
-DEVELOPER_DIR=/Applications/Xcode_26.3.app/Contents/Developer swift run xmark --help
+DEVELOPER_DIR=/Applications/Xcode_26.3.app/Contents/Developer swift run xpt --help
 ```
 
 Or switch xcode-select permanently (requires sudo):
@@ -25,24 +25,24 @@ sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
 ## Structure
 
 ```
-Sources/xmark/
+Sources/xpt/
   XMark.swift              # @main entry point, registers all subcommands
   Commands/
-    Setup.swift            # xmark setup
-    Save.swift             # xmark save
-    Restore.swift          # xmark restore
-    List.swift             # xmark list
-    Delete.swift           # xmark delete
-    Config.swift           # xmark config
-    Hook.swift             # xmark _hook (internal, called by git hook)
+    Setup.swift            # xpt setup
+    Save.swift             # xpt save
+    Restore.swift          # xpt restore
+    List.swift             # xpt list
+    Delete.swift           # xpt delete
+    Config.swift           # xpt config
+    Hook.swift             # xpt _hook (internal, called by git hook)
 ```
 
 ## Key Design Notes
 
 - Breakpoint file: `<project>/xcuserdata/<USER>.xcuserdatad/Breakpoints_v2.xcbkptlist`
-- Storage: `~/.xmark/<repo-sha>/`  (SHA-256 of remote URL or repo root path)
-- Per-repo config: `.xmark` JSON at repo root (gitignored)
-- Git hook: `post-checkout`, installed by `xmark setup`
+- Storage: `~/.xpt/<repo-sha>/`  (SHA-256 of remote URL or repo root path)
+- Per-repo config: `.xpt` JSON at repo root (gitignored)
+- Git hook: `post-checkout`, installed by `xpt setup`
 
 ## Git Commits
 

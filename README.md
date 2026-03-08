@@ -1,14 +1,14 @@
-# xmark
+# xpt
 
 Save and restore per-branch Xcode breakpoints automatically.
 
-When you switch git branches, Xcode breakpoints stay anchored to line numbers from the wrong version of your code. xmark fixes this by hooking into `git checkout` to save your breakpoints before you leave a branch and restore them when you return.
+When you switch git branches, Xcode breakpoints stay anchored to line numbers from the wrong version of your code. xpt fixes this by hooking into `git checkout` to save your breakpoints before you leave a branch and restore them when you return.
 
 ---
 
 ## How it works
 
-Xcode stores breakpoints in a file called `Breakpoints_v2.xcbkptlist` inside your project's `xcuserdata` directory. xmark copies that file in and out of `~/.xmark/` keyed by repo and branch name. No Xcode plugin, no LLDB scripting — just file copies triggered by a git hook.
+Xcode stores breakpoints in a file called `Breakpoints_v2.xcbkptlist` inside your project's `xcuserdata` directory. xpt copies that file in and out of `~/.xpt/` keyed by repo and branch name. No Xcode plugin, no LLDB scripting — just file copies triggered by a git hook.
 
 The breakpoint file location depends on your Xcode version:
 
@@ -17,9 +17,9 @@ The breakpoint file location depends on your Xcode version:
 | Xcode 26+ | `MyApp.xcodeproj/xcuserdata/<user>.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist` |
 | Xcode 15 and earlier | `MyApp.xcodeproj/xcuserdata/<user>.xcuserdatad/Breakpoints_v2.xcbkptlist` |
 
-xmark detects which path is in use automatically — it checks for the `xcdebugger/` path first and falls back to the legacy path if it doesn't exist.
+xpt detects which path is in use automatically — it checks for the `xcdebugger/` path first and falls back to the legacy path if it doesn't exist.
 
-Because Xcode loads breakpoints at project-open time and does not watch the file for external changes, xmark uses AppleScript to close and reopen your project after each restore. This makes the new breakpoints appear immediately without any manual steps.
+Because Xcode loads breakpoints at project-open time and does not watch the file for external changes, xpt uses AppleScript to close and reopen your project after each restore. This makes the new breakpoints appear immediately without any manual steps.
 
 ---
 
@@ -56,16 +56,16 @@ ls /Applications | grep Xcode
 Once `xcode-select` points at Xcode, build normally:
 
 ```sh
-git clone https://github.com/coveloper/xmark.git
-cd xmark
+git clone https://github.com/coveloper/xpt.git
+cd xpt
 swift build -c release
-cp .build/release/xmark /usr/local/bin/xmark
+cp .build/release/xpt /usr/local/bin/xpt
 ```
 
 Verify it worked:
 
 ```sh
-xmark --version
+xpt --version
 # 0.1.0
 ```
 
@@ -73,23 +73,23 @@ xmark --version
 
 ## Quick start
 
-There are two parts to getting xmark running: a one-time global step, and a per-repo setup step.
+There are two parts to getting xpt running: a one-time global step, and a per-repo setup step.
 
-### Step 1 — Tell xmark which Xcode project to use (per repo)
+### Step 1 — Tell xpt which Xcode project to use (per repo)
 
 Run this from the root of your git repo (the same directory that contains your `.xcworkspace` or `.xcodeproj`):
 
 ```sh
 cd ~/Developer/MyApp
-xmark config --set project=MyApp.xcworkspace
+xpt config --set project=MyApp.xcworkspace
 ```
 
-If your repo contains exactly one `.xcworkspace` or `.xcodeproj` at the root, you can skip this step — xmark will find it automatically.
+If your repo contains exactly one `.xcworkspace` or `.xcodeproj` at the root, you can skip this step — xpt will find it automatically.
 
 ### Step 2 — Install the git hook
 
 ```sh
-xmark setup
+xpt setup
 ```
 
 That's it. From this point on, every `git checkout` automatically saves your current branch's breakpoints and restores the new branch's breakpoints.
@@ -107,8 +107,8 @@ Set a few breakpoints in your code on your current branch (`main` or whatever yo
 ### 2. Save your current branch's breakpoints manually
 
 ```sh
-xmark save
-# xmark: Breakpoints saved for branch 'main'.
+xpt save
+# xpt: Breakpoints saved for branch 'main'.
 ```
 
 ### 3. Switch to another branch
@@ -117,9 +117,9 @@ xmark save
 git checkout feature/my-feature
 ```
 
-If the hook is installed, xmark runs automatically at this point — it saves your `main` breakpoints, restores any saved breakpoints for `feature/my-feature`, and reloads the Xcode project so the change takes effect immediately. Xcode will close and reopen your project; this is normal.
+If the hook is installed, xpt runs automatically at this point — it saves your `main` breakpoints, restores any saved breakpoints for `feature/my-feature`, and reloads the Xcode project so the change takes effect immediately. Xcode will close and reopen your project; this is normal.
 
-If `feature/my-feature` has no saved breakpoints yet, xmark clears the breakpoint file (the default behavior) or leaves it alone, depending on your `onEmptyBranch` setting.
+If `feature/my-feature` has no saved breakpoints yet, xpt clears the breakpoint file (the default behavior) or leaves it alone, depending on your `onEmptyBranch` setting.
 
 ### 4. Set breakpoints for the new branch
 
@@ -131,12 +131,12 @@ Your breakpoints from `main` should be gone. Add some new breakpoints that make 
 git checkout main
 ```
 
-xmark automatically saves `feature/my-feature`'s breakpoints, restores `main`'s breakpoints, and reloads Xcode. Your original breakpoints should be back exactly where you left them.
+xpt automatically saves `feature/my-feature`'s breakpoints, restores `main`'s breakpoints, and reloads Xcode. Your original breakpoints should be back exactly where you left them.
 
 ### 6. Confirm what's stored
 
 ```sh
-xmark list
+xpt list
 # Saved breakpoints for MyApp (origin: github.com/you/MyApp):
 #
 #   main                      (2 minutes ago)
@@ -147,69 +147,69 @@ xmark list
 
 ## Command reference
 
-### `xmark setup`
+### `xpt setup`
 
-Installs a `post-checkout` git hook in the current repo and updates `.gitignore` with targeted entries for `Breakpoints_v2.xcbkptlist` and `.xmark`.
+Installs a `post-checkout` git hook in the current repo and updates `.gitignore` with targeted entries for `Breakpoints_v2.xcbkptlist` and `.xpt`.
 
 ```sh
-xmark setup
+xpt setup
 ```
 
-The gitignore entries are version-aware: xmark detects your installed Xcode and adds the appropriate path pattern (Xcode 16+ uses `xcdebugger/Breakpoints_v2.xcbkptlist`; earlier versions use the legacy path). If `xcodebuild` is unavailable, both patterns are added. Re-running `xmark setup` is safe — it won't add duplicate entries.
+The gitignore entries are version-aware: xpt detects your installed Xcode and adds the appropriate path pattern (Xcode 16+ uses `xcdebugger/Breakpoints_v2.xcbkptlist`; earlier versions use the legacy path). If `xcodebuild` is unavailable, both patterns are added. Re-running `xpt setup` is safe — it won't add duplicate entries.
 
-If a `post-checkout` hook already exists (from Lefthook, Husky, etc.), xmark will not overwrite it. Instead, it prints the line you need to add manually:
+If a `post-checkout` hook already exists (from Lefthook, Husky, etc.), xpt will not overwrite it. Instead, it prints the line you need to add manually:
 
 ```
-xmark setup: A post-checkout hook already exists at .git/hooks/post-checkout.
-Add the following line to your existing hook to enable xmark:
+xpt setup: A post-checkout hook already exists at .git/hooks/post-checkout.
+Add the following line to your existing hook to enable xpt:
 
-    xmark _hook post-checkout "$1" "$2" "$3"
+    xpt _hook post-checkout "$1" "$2" "$3"
 ```
 
 ---
 
-### `xmark save`
+### `xpt save`
 
 Saves the current breakpoint file as a snapshot for the current branch.
 
 ```sh
-xmark save
+xpt save
 ```
 
 Save as a specific branch name:
 
 ```sh
-xmark save --branch feature/my-feature
+xpt save --branch feature/my-feature
 ```
 
 ---
 
-### `xmark restore`
+### `xpt restore`
 
 Restores the saved breakpoint snapshot for the current branch.
 
 ```sh
-xmark restore
+xpt restore
 ```
 
 Restore from a specific branch's snapshot:
 
 ```sh
-xmark restore --branch main
+xpt restore --branch main
 ```
 
-If no snapshot exists for the branch, xmark applies your `onEmptyBranch` policy (see Configuration below).
+If no snapshot exists for the branch, xpt applies your `onEmptyBranch` policy (see Configuration below).
 
-If Xcode is open, xmark automatically closes and reopens your project so the restored breakpoints take effect immediately. Any active debug session will be terminated — this is expected when switching branches.
+If Xcode is open, xpt automatically closes and reopens your project so the restored breakpoints take effect immediately. Any active debug session will be terminated — this is expected when switching branches.
 
 ---
 
-### `xmark list`
+### `xpt list`
 
 Shows all saved breakpoint snapshots for the current repo.
 
 ```sh
-xmark list
+xpt list
 # Saved breakpoints for MyApp (origin: github.com/you/MyApp):
 #
 #   main                      (3 days ago)
@@ -219,25 +219,25 @@ xmark list
 
 ---
 
-### `xmark delete`
+### `xpt delete`
 
 Removes the saved snapshot for a branch.
 
 ```sh
-xmark delete feature/old-branch
+xpt delete feature/old-branch
 ```
 
 ---
 
-### `xmark config`
+### `xpt config`
 
 Displays or sets per-repo configuration.
 
 Show current config:
 
 ```sh
-xmark config
-# Config at /path/to/repo/.xmark:
+xpt config
+# Config at /path/to/repo/.xpt:
 #
 # {
 #   "onEmptyBranch" : "clear",
@@ -248,15 +248,15 @@ xmark config
 Set a value:
 
 ```sh
-xmark config --set project=MyApp.xcworkspace
-xmark config --set onEmptyBranch=preserve
+xpt config --set project=MyApp.xcworkspace
+xpt config --set onEmptyBranch=preserve
 ```
 
 ---
 
 ## Configuration
 
-The `.xmark` file at your repo root controls per-repo behaviour. It is created by `xmark config --set` and contains machine-specific settings. `xmark setup` adds it to `.gitignore` automatically.
+The `.xpt` file at your repo root controls per-repo behaviour. It is created by `xpt config --set` and contains machine-specific settings. `xpt setup` adds it to `.gitignore` automatically.
 
 | Key | Values | Default | Description |
 |---|---|---|---|
@@ -273,10 +273,10 @@ The `.xmark` file at your repo root controls per-repo behaviour. It is created b
 
 ## Storage
 
-xmark stores snapshots in `~/.xmark/`, organized by repo and branch:
+xpt stores snapshots in `~/.xpt/`, organized by repo and branch:
 
 ```
-~/.xmark/
+~/.xpt/
   <repo-identifier>/           # SHA-256 of the git remote URL (or repo path if no remote)
     main.xcbkptlist
     feature__login.xcbkptlist  # '/' in branch names is stored as '__'
@@ -285,24 +285,24 @@ xmark stores snapshots in `~/.xmark/`, organized by repo and branch:
 
 Snapshots are plain XML plist files — the same format Xcode uses. You can inspect them with any text editor.
 
-To remove all stored snapshots for a repo, delete its directory from `~/.xmark/`. To wipe everything:
+To remove all stored snapshots for a repo, delete its directory from `~/.xpt/`. To wipe everything:
 
 ```sh
-rm -rf ~/.xmark/
+rm -rf ~/.xpt/
 ```
 
 ---
 
 ## Working with existing git hooks
 
-If you already have a `post-checkout` hook (common with Lefthook, Husky, or custom scripts), `xmark setup` will detect it and print the snippet to add manually rather than overwriting your hook:
+If you already have a `post-checkout` hook (common with Lefthook, Husky, or custom scripts), `xpt setup` will detect it and print the snippet to add manually rather than overwriting your hook:
 
 ```sh
-xmark setup
-# xmark setup: A post-checkout hook already exists at .git/hooks/post-checkout.
-# Add the following line to your existing hook to enable xmark:
+xpt setup
+# xpt setup: A post-checkout hook already exists at .git/hooks/post-checkout.
+# Add the following line to your existing hook to enable xpt:
 #
-#     xmark _hook post-checkout "$1" "$2" "$3"
+#     xpt _hook post-checkout "$1" "$2" "$3"
 ```
 
 Open `.git/hooks/post-checkout` in your editor and add that line.
@@ -311,11 +311,11 @@ Open `.git/hooks/post-checkout` in your editor and add that line.
 
 ## Using from the Xcode debugger console
 
-You can call xmark directly from the LLDB console using the `!` shell escape prefix — no need to leave the debugger:
+You can call xpt directly from the LLDB console using the `!` shell escape prefix — no need to leave the debugger:
 
 ```
-(lldb) !xmark save
-(lldb) !xmark list
+(lldb) !xpt save
+(lldb) !xpt list
 ```
 
 This is handy for capturing a precise breakpoint state before a risky rebase or experiment.
@@ -326,21 +326,21 @@ This is handy for capturing a precise breakpoint state before a risky rebase or 
 
 **"No .xcworkspace or .xcodeproj found in the repo root"**
 
-Your repo root has either no Xcode project, or more than one. Tell xmark which to use:
+Your repo root has either no Xcode project, or more than one. Tell xpt which to use:
 
 ```sh
-xmark config --set project=MyApp.xcworkspace
+xpt config --set project=MyApp.xcworkspace
 ```
 
 **"No breakpoint file found"**
 
-Xcode hasn't created the breakpoint file yet. Open Xcode, set at least one breakpoint, then run `xmark save`.
+Xcode hasn't created the breakpoint file yet. Open Xcode, set at least one breakpoint, then run `xpt save`.
 
 **Breakpoints didn't restore after switching branches**
 
 1. Confirm the hook is installed: `cat .git/hooks/post-checkout`
-2. Confirm `xmark` is in your PATH: `which xmark`
-3. Try a manual restore: `xmark restore` — this also reloads Xcode automatically if it's open
+2. Confirm `xpt` is in your PATH: `which xpt`
+3. Try a manual restore: `xpt restore` — this also reloads Xcode automatically if it's open
 4. If Xcode didn't reopen automatically, close and reopen it manually
 
 **Branch switched but nothing happened**
@@ -355,13 +355,13 @@ See [Working with existing git hooks](#working-with-existing-git-hooks) above.
 
 ## Multi-project repos
 
-If your repo contains multiple `.xcworkspace` or `.xcodeproj` files, xmark requires explicit configuration:
+If your repo contains multiple `.xcworkspace` or `.xcodeproj` files, xpt requires explicit configuration:
 
 ```sh
-xmark config --set project=MyApp.xcworkspace
+xpt config --set project=MyApp.xcworkspace
 ```
 
-Without this, xmark exits with an error listing the candidates it found.
+Without this, xpt exits with an error listing the candidates it found.
 
 ---
 
@@ -370,7 +370,7 @@ Without this, xmark exits with an error listing the candidates it found.
 Remove the binary:
 
 ```sh
-rm /usr/local/bin/xmark
+rm /usr/local/bin/xpt
 ```
 
 Remove the git hook from any repo where you installed it:
@@ -382,7 +382,7 @@ rm .git/hooks/post-checkout
 Remove all stored snapshots:
 
 ```sh
-rm -rf ~/.xmark/
+rm -rf ~/.xpt/
 ```
 
 ---
