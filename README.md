@@ -311,11 +311,11 @@ Open `.git/hooks/post-checkout` in your editor and add that line.
 
 ## Using from the Xcode debugger console
 
-You can call xpt directly from the LLDB console using the `!` shell escape prefix — no need to leave the debugger:
+You can call xpt directly from the LLDB console using the `shell` command — no need to leave the debugger:
 
 ```
-(lldb) !xpt save
-(lldb) !xpt list
+(lldb) shell xpt save
+(lldb) shell xpt list
 ```
 
 This is handy for capturing a precise breakpoint state before a risky rebase or experiment.
