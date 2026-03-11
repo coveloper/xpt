@@ -16,20 +16,23 @@ struct RepoConfig: Codable {
 
     // MARK: - Load / Save
 
+    private static var prettyEncoder: JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        return encoder
+    }
+
     static func load(from repoRoot: URL) throws -> RepoConfig {
         let url = configURL(repoRoot: repoRoot)
-        guard FileManager.default.fileExists(atPath: url.path) else {
+        guard let data = try? Data(contentsOf: url) else {
             return RepoConfig()
         }
-        let data = try Data(contentsOf: url)
         return try JSONDecoder().decode(RepoConfig.self, from: data)
     }
 
     func save(to repoRoot: URL) throws {
         let url = RepoConfig.configURL(repoRoot: repoRoot)
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let data = try encoder.encode(self)
+        let data = try RepoConfig.prettyEncoder.encode(self)
         try data.write(to: url, options: .atomic)
     }
 
@@ -56,9 +59,7 @@ struct RepoConfig: Codable {
     // MARK: - Display
 
     func prettyPrinted() throws -> String {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let data = try encoder.encode(self)
+        let data = try RepoConfig.prettyEncoder.encode(self)
         return String(data: data, encoding: .utf8) ?? "{}"
     }
 }

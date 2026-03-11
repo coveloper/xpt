@@ -19,11 +19,9 @@ struct StorageManager {
 
     init(repoRoot: URL) throws {
         let identifier = Self.repoIdentifier(repoRoot: repoRoot)
-        let base = URL(fileURLWithPath: NSHomeDirectory())
+        self.repoDirectory = URL(fileURLWithPath: NSHomeDirectory())
             .appendingPathComponent(".xpt")
             .appendingPathComponent(identifier)
-        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
-        self.repoDirectory = base
     }
 
     // MARK: - Repo identifier
@@ -60,13 +58,8 @@ struct StorageManager {
 
     func save(from sourceURL: URL, branch: String) throws {
         let dest = snapshotURL(for: branch)
-        try FileManager.default.createDirectory(
-            at: dest.deletingLastPathComponent(),
-            withIntermediateDirectories: true
-        )
-        if FileManager.default.fileExists(atPath: dest.path) {
-            try FileManager.default.removeItem(at: dest)
-        }
+        try ensureParentDirectory(for: dest)
+        try? FileManager.default.removeItem(at: dest)
         try FileManager.default.copyItem(at: sourceURL, to: dest)
     }
 
@@ -75,13 +68,8 @@ struct StorageManager {
         guard FileManager.default.fileExists(atPath: source.path) else {
             throw StorageError.noSnapshotFound(branch)
         }
-        try FileManager.default.createDirectory(
-            at: destinationURL.deletingLastPathComponent(),
-            withIntermediateDirectories: true
-        )
-        if FileManager.default.fileExists(atPath: destinationURL.path) {
-            try FileManager.default.removeItem(at: destinationURL)
-        }
+        try ensureParentDirectory(for: destinationURL)
+        try? FileManager.default.removeItem(at: destinationURL)
         try FileManager.default.copyItem(at: source, to: destinationURL)
     }
 
@@ -94,10 +82,7 @@ struct StorageManager {
     }
 
     func clearBreakpoints(at destinationURL: URL) throws {
-        try FileManager.default.createDirectory(
-            at: destinationURL.deletingLastPathComponent(),
-            withIntermediateDirectories: true
-        )
+        try ensureParentDirectory(for: destinationURL)
         // Write an empty (valid) breakpoint list
         let empty = """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -140,6 +125,15 @@ struct StorageManager {
                 return SnapshotInfo(branch: branch, modifiedDate: date)
             }
             .sorted { $0.modifiedDate > $1.modifiedDate }
+    }
+
+    // MARK: - Helpers
+
+    private func ensureParentDirectory(for url: URL) throws {
+        try FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
     }
 
     // MARK: - Branch name sanitization

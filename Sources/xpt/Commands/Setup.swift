@@ -6,12 +6,8 @@ struct Setup: ParsableCommand {
         abstract: "Install the post-checkout git hook into the current repo."
     )
 
-    static let hookScript = """
-    #!/bin/sh
-    xpt _hook post-checkout "$1" "$2" "$3"
-    """
-
     static let hookSnippet = #"xpt _hook post-checkout "$1" "$2" "$3""#
+    static let hookScript = "#!/bin/sh\n\(hookSnippet)\n"
 
     func run() throws {
         let repoRoot = try GitUtilities.repoRoot()
@@ -70,12 +66,12 @@ struct Setup: ParsableCommand {
         let hasBroadXcuserdata = lines.contains(where: { $0.contains("xcuserdata") })
         let hasNewPattern    = lines.contains("**/xcuserdata/*/xcdebugger/Breakpoints_v2.xcbkptlist")
         let hasLegacyPattern = lines.contains("**/xcuserdata/*/Breakpoints_v2.xcbkptlist")
-        let needsXmarkConfig = !lines.contains(where: { $0.trimmingCharacters(in: .whitespaces) == ".xpt" })
+        let needsXptConfig = !lines.contains(where: { $0.trimmingCharacters(in: .whitespaces) == ".xpt" })
 
         let needsNew    = !hasBroadXcuserdata && wantsNew    && !hasNewPattern
         let needsLegacy = !hasBroadXcuserdata && wantsLegacy && !hasLegacyPattern
 
-        if needsNew || needsLegacy || needsXmarkConfig {
+        if needsNew || needsLegacy || needsXptConfig {
             var updated = existing
             if !updated.hasSuffix("\n") && !updated.isEmpty { updated += "\n" }
             if needsNew {
@@ -86,7 +82,7 @@ struct Setup: ParsableCommand {
                 updated += "\n# xpt — per-branch breakpoints (Xcode 15 and earlier)\n"
                 updated += "**/xcuserdata/*/Breakpoints_v2.xcbkptlist\n"
             }
-            if needsXmarkConfig {
+            if needsXptConfig {
                 updated += "\n# xpt — per-repo config\n"
                 updated += ".xpt\n"
             }
