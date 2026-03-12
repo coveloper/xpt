@@ -18,14 +18,18 @@ enum XcodeUtilities {
     static func reloadProject(projectURL: URL) -> Bool {
         guard isRunning else { return false }
 
-        let projectPath = projectURL.path
+        // Escape the path for safe embedding in an AppleScript string literal.
+        // AppleScript has no backslash escape for double quotes inside strings;
+        // the safe approach is to split on `"` and rejoin using the `quote` constant.
+        // e.g. /path/with"quote → "/path/with" & quote & "quote"
+        let escapedPath = escapeForAppleScript(projectURL.path)
 
         // Close the project document and reopen it so Xcode re-reads the breakpoint file.
         // "saving yes" ensures unsaved source edits are written before closing.
         let script = """
         tell application "Xcode"
             try
-                set proj to first workspace document whose path is "\(projectPath)"
+                set proj to first workspace document whose path is \(escapedPath)
                 close proj saving yes
             on error
                 -- project may not be open; just fall through
@@ -33,7 +37,7 @@ enum XcodeUtilities {
         end tell
         delay 0.5
         tell application "Xcode"
-            open "\(projectPath)"
+            open \(escapedPath)
             activate
         end tell
         """
@@ -48,5 +52,15 @@ enum XcodeUtilities {
         process.waitUntilExit()
 
         return true
+    }
+
+    // MARK: - AppleScript escaping
+
+    /// Wraps a string in an AppleScript string expression, safely handling embedded
+    /// double-quote characters by using AppleScript's `quote` constant.
+    private static func escapeForAppleScript(_ string: String) -> String {
+        let parts = string.components(separatedBy: "\"")
+        guard parts.count > 1 else { return "\"\(string)\"" }
+        return "\"" + parts.joined(separator: "\" & quote & \"") + "\""
     }
 }
