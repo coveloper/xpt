@@ -36,10 +36,11 @@ enum GitUtilities {
     /// Resolves a branch name from a full ref or SHA (as passed by git hooks).
     static func branchName(for ref: String) throws -> String {
         // Try symbolic ref first (works when ref is a branch tip)
-        if let name = try? run("git", "name-rev", "--name-only", "--no-undefined", ref) {
-            // name-rev may return things like "main~1" — strip the suffix
-            let clean = name.components(separatedBy: "~").first!
-                           .components(separatedBy: "^").first!
+        if let name = try? run("git", "name-rev", "--name-only", "--no-undefined", ref),
+           !name.isEmpty {
+            // name-rev may return things like "main~1" or "main^2" — strip the suffix
+            let trimmed = name.components(separatedBy: "~").first ?? name
+            let clean = trimmed.components(separatedBy: "^").first ?? trimmed
             return clean
         }
         throw GitError.branchNotFound(ref)
