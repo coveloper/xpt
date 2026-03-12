@@ -4,6 +4,7 @@ import CryptoKit
 enum StorageError: Error, CustomStringConvertible {
     case noSnapshotFound(String)
     case symlinkDetected(String)
+    case invalidBranchName(String)
 
     var description: String {
         switch self {
@@ -11,6 +12,8 @@ enum StorageError: Error, CustomStringConvertible {
             return "No saved breakpoints found for branch '\(branch)'."
         case .symlinkDetected(let path):
             return "Refusing to operate on '\(path)': it is a symbolic link. xpt does not follow symlinks for security."
+        case .invalidBranchName(let branch):
+            return "Invalid branch name '\(branch)': must not be empty or contain null bytes or newlines."
         }
     }
 }
@@ -60,6 +63,7 @@ struct StorageManager {
     // MARK: - Save / Restore / Delete
 
     func save(from sourceURL: URL, branch: String) throws {
+        try validateBranchName(branch)
         let dest = snapshotURL(for: branch)
         try ensureParentDirectory(for: dest)
         // Refuse to overwrite a symlink in the storage directory. A symlink placed
@@ -72,6 +76,7 @@ struct StorageManager {
     }
 
     func restore(to destinationURL: URL, branch: String) throws {
+        try validateBranchName(branch)
         let source = snapshotURL(for: branch)
         guard FileManager.default.fileExists(atPath: source.path) else {
             throw StorageError.noSnapshotFound(branch)
@@ -93,6 +98,7 @@ struct StorageManager {
     }
 
     func delete(branch: String) throws {
+        try validateBranchName(branch)
         let url = snapshotURL(for: branch)
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw StorageError.noSnapshotFound(branch)
@@ -157,6 +163,17 @@ struct StorageManager {
             at: url.deletingLastPathComponent(),
             withIntermediateDirectories: true
         )
+    }
+
+    /// Validates that `branch` is safe to use as a storage key.
+    /// Rejects empty strings, null bytes, and newlines — characters that could
+    /// corrupt filesystem paths or git command arguments.
+    private func validateBranchName(_ branch: String) throws {
+        guard !branch.isEmpty,
+              !branch.contains("\0"),
+              !branch.contains("\n") else {
+            throw StorageError.invalidBranchName(branch)
+        }
     }
 
     /// Returns true if the item at `url` exists and is a symbolic link.
