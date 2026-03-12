@@ -204,13 +204,23 @@ struct StorageManager {
 
     // MARK: - Branch name sanitization
 
-    /// Replaces filesystem-unsafe characters with safe equivalents.
+    /// Percent-encodes `branch` for safe use as a flat filename.
+    ///
+    /// Only `/` and `%` are encoded — everything else is preserved verbatim.
+    /// `%` must be encoded first to avoid double-encoding it on round-trip.
+    ///
+    ///   "feature/login"  → "feature%2Flogin"
+    ///   "foo%bar"        → "foo%25bar"
+    ///
+    /// This encoding is bijective: distinct branch names always produce distinct
+    /// filenames, and unsanitize() is an exact inverse.
     private func sanitize(_ branch: String) -> String {
-        // Replace '/' with '__' to avoid unintended subdirectory creation
-        branch.replacingOccurrences(of: "/", with: "__")
+        branch
+            .replacingOccurrences(of: "%", with: "%25")
+            .replacingOccurrences(of: "/", with: "%2F")
     }
 
     private func unsanitize(_ filename: String) -> String {
-        filename.replacingOccurrences(of: "__", with: "/")
+        filename.removingPercentEncoding ?? filename
     }
 }
