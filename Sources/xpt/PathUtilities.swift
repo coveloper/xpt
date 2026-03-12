@@ -4,6 +4,7 @@ enum PathError: Error, CustomStringConvertible {
     case noProjectFound
     case multipleProjectsFound([String])
     case breakpointFileNotFound(String)
+    case projectOutsideRepo(String)
 
     var description: String {
         switch self {
@@ -13,6 +14,8 @@ enum PathError: Error, CustomStringConvertible {
             return "Multiple Xcode projects found: \(names.joined(separator: ", ")). Run 'xpt config --set project=<name>' to specify which to use."
         case .breakpointFileNotFound(let path):
             return "Breakpoint file not found at: \(path)"
+        case .projectOutsideRepo(let name):
+            return "Configured project '\(name)' resolves outside the repository root. Check your .xpt config file."
         }
     }
 }
@@ -27,7 +30,15 @@ enum PathUtilities {
     /// Resolves the Xcode project file URL from config or by auto-discovery.
     static func projectURL(repoRoot: URL, configuredProject: String?) throws -> URL {
         if let configured = configuredProject {
-            return repoRoot.appendingPathComponent(configured)
+            let resolved = repoRoot.appendingPathComponent(configured).standardizedFileURL
+            let root = repoRoot.standardizedFileURL
+            // Prevent directory traversal: the configured project must remain inside the repo root.
+            // e.g. a .xpt config with "project": "../../etc/passwd" must be rejected.
+            let rootPrefix = root.path.hasSuffix("/") ? root.path : root.path + "/"
+            guard resolved.path.hasPrefix(rootPrefix) else {
+                throw PathError.projectOutsideRepo(configured)
+            }
+            return resolved
         }
         return try autoDetectProject(in: repoRoot)
     }
