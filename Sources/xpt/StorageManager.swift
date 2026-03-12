@@ -5,6 +5,7 @@ enum StorageError: Error, CustomStringConvertible {
     case noSnapshotFound(String)
     case symlinkDetected(String)
     case invalidBranchName(String)
+    case invalidSnapshot(String)
 
     var description: String {
         switch self {
@@ -14,6 +15,8 @@ enum StorageError: Error, CustomStringConvertible {
             return "Refusing to operate on '\(path)': it is a symbolic link. xpt does not follow symlinks for security."
         case .invalidBranchName(let branch):
             return "Invalid branch name '\(branch)': must not be empty or contain null bytes or newlines."
+        case .invalidSnapshot(let path):
+            return "Snapshot at '\(path)' is not a valid plist file and will not be restored. Delete it with 'xpt delete' and re-save if needed."
         }
     }
 }
@@ -87,6 +90,8 @@ struct StorageManager {
         if Self.isSymlink(at: source) {
             throw StorageError.symlinkDetected(source.path)
         }
+        // Validate the snapshot is a well-formed plist before overwriting the live file.
+        try validatePlistFile(at: source)
         try ensureParentDirectory(for: destinationURL)
         // Refuse to overwrite a symlink at the destination. A symlink placed at the
         // breakpoint file location could redirect the write to an arbitrary file.
@@ -163,6 +168,18 @@ struct StorageManager {
             at: url.deletingLastPathComponent(),
             withIntermediateDirectories: true
         )
+    }
+
+    /// Verifies that the file at `url` is a parseable property list.
+    /// Prevents restoring corrupted or malformed snapshots over the live breakpoint file.
+    private func validatePlistFile(at url: URL) throws {
+        let data = try Data(contentsOf: url)
+        var format: PropertyListSerialization.PropertyListFormat = .xml
+        do {
+            _ = try PropertyListSerialization.propertyList(from: data, options: [], format: &format)
+        } catch {
+            throw StorageError.invalidSnapshot(url.path)
+        }
     }
 
     /// Validates that `branch` is safe to use as a storage key.
