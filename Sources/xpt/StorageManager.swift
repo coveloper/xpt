@@ -170,13 +170,15 @@ struct StorageManager {
         )
     }
 
-    /// Verifies that the file at `url` is a parseable property list.
+    /// Verifies that the file at `url` is well-formed XML.
     /// Prevents restoring corrupted or malformed snapshots over the live breakpoint file.
+    ///
+    /// Xcode breakpoint files use a `<Bucket>` root element, not a `<plist>` root, so
+    /// PropertyListSerialization cannot be used here. XMLDocument is the right validator.
     private func validatePlistFile(at url: URL) throws {
         let data = try Data(contentsOf: url)
-        var format: PropertyListSerialization.PropertyListFormat = .xml
         do {
-            _ = try PropertyListSerialization.propertyList(from: data, options: [], format: &format)
+            _ = try XMLDocument(data: data, options: [])
         } catch {
             throw StorageError.invalidSnapshot(url.path)
         }
