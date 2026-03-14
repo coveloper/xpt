@@ -46,4 +46,4 @@ Sources/xpt/
 
 ## Git Commits
 
-Only commit to THIS repository (`/Users/jonbauer/Developer/Projects/Xpt/Dev/Source/xpt/`).
+Only commit to THIS repository (the `xpt` repo).
