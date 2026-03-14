@@ -54,6 +54,8 @@ struct Hook: ParsableCommand {
             case .preserve:
                 break // leave existing file untouched
             }
+        } catch {
+            fputs("xpt: restore failed for '\(newBranch)': \(error)\n", stderr)
         }
 
         // 3. Reload Xcode project so it picks up the new breakpoint file
