@@ -64,10 +64,23 @@ struct Hook: ParsableCommand {
 
     // MARK: - Previous branch resolution
 
-    /// Resolves the branch name for a given SHA, excluding `currentBranch`.
+    /// Resolves the branch name for the branch we just left, excluding `currentBranch`.
     /// Returns nil if the branch cannot be reliably determined (non-fatal).
     private func resolvePreviousBranch(sha: String, excluding currentBranch: String) -> String? {
-        // Ask git which local branches point to this SHA
+        // Primary: read the most recent reflog entry for HEAD. git records every
+        // checkout as "checkout: moving from <prev> to <new>", giving us the exact
+        // branch names regardless of how many branches share the same SHA.
+        if let entry = try? GitUtilities.run("git", "reflog", "-1", "HEAD", "--format=%gs"),
+           entry.hasPrefix("checkout: moving from ") {
+            let rest = String(entry.dropFirst("checkout: moving from ".count))
+            if let prev = rest.components(separatedBy: " to ").first,
+               !prev.isEmpty, prev != currentBranch {
+                return prev
+            }
+        }
+
+        // Fallback: ask git which local branches point to this SHA. Only reliable
+        // when exactly one branch (other than currentBranch) matches.
         guard let output = try? GitUtilities.run(
             "git", "branch", "--points-at", sha, "--format=%(refname:short)"
         ) else { return nil }
@@ -81,7 +94,7 @@ struct Hook: ParsableCommand {
             return unique
         }
 
-        // Multiple or zero candidates — fall back to name-rev
+        // Last resort: name-rev. Unreliable when multiple branches share the SHA.
         return try? GitUtilities.branchName(for: sha)
     }
 }
