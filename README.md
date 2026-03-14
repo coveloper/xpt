@@ -1,6 +1,6 @@
 # xpt
 
-![Version](https://img.shields.io/badge/version-0.3.1-blue) ![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey) ![Swift](https://img.shields.io/badge/swift-6.1-orange) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-0.3.2-blue) ![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey) ![Swift](https://img.shields.io/badge/swift-6.1-orange) ![License](https://img.shields.io/badge/license-MIT-green)
 
 Save and restore per-branch Xcode breakpoints automatically.
 
@@ -52,7 +52,7 @@ Verify it worked:
 
 ```sh
 xpt --version
-# 0.3.1
+# 0.3.2
 ```
 
 ---
