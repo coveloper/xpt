@@ -44,43 +44,22 @@ struct Setup: ParsableCommand {
         print("Run 'xpt setup' again in any other repo you want to enable.")
     }
 
-    private func xcodeVersion() -> Int? {
-        guard let output = try? GitUtilities.run("xcodebuild", "-version") else { return nil }
-        let firstLine = output.components(separatedBy: "\n").first ?? ""
-        guard firstLine.hasPrefix("Xcode ") else { return nil }
-        let versionStr = String(firstLine.dropFirst("Xcode ".count))
-        return Int(versionStr.components(separatedBy: ".").first ?? "")
-    }
-
     private func configureGitignore(repoRoot: URL) throws {
         let gitignorePath = repoRoot.appendingPathComponent(".gitignore")
         let fileExists = FileManager.default.fileExists(atPath: gitignorePath.path)
         let existing = (try? String(contentsOf: gitignorePath, encoding: .utf8)) ?? ""
         let lines = existing.components(separatedBy: "\n")
 
-        let version = xcodeVersion()
-        let wantsNew    = version == nil || version! >= 16
-        let wantsLegacy = version == nil || version! < 16
-
         // If any xcuserdata entry already exists, treat it as sufficient
-        let hasBroadXcuserdata = lines.contains(where: { $0.contains("xcuserdata") })
-        let hasNewPattern    = lines.contains("**/xcuserdata/*/xcdebugger/Breakpoints_v2.xcbkptlist")
-        let hasLegacyPattern = lines.contains("**/xcuserdata/*/Breakpoints_v2.xcbkptlist")
+        let hasXcuserdata = lines.contains(where: { $0.contains("xcuserdata") })
         let needsXptConfig = !lines.contains(where: { $0.trimmingCharacters(in: .whitespaces) == ".xpt" })
 
-        let needsNew    = !hasBroadXcuserdata && wantsNew    && !hasNewPattern
-        let needsLegacy = !hasBroadXcuserdata && wantsLegacy && !hasLegacyPattern
-
-        if needsNew || needsLegacy || needsXptConfig {
+        if !hasXcuserdata || needsXptConfig {
             var updated = existing
             if !updated.hasSuffix("\n") && !updated.isEmpty { updated += "\n" }
-            if needsNew {
-                updated += "\n# xpt — per-branch breakpoints (Xcode 16+)\n"
-                updated += "**/xcuserdata/*/xcdebugger/Breakpoints_v2.xcbkptlist\n"
-            }
-            if needsLegacy {
-                updated += "\n# xpt — per-branch breakpoints (Xcode 15 and earlier)\n"
-                updated += "**/xcuserdata/*/Breakpoints_v2.xcbkptlist\n"
+            if !hasXcuserdata {
+                updated += "\n# xpt — Xcode per-user data (breakpoints, workspace state)\n"
+                updated += "**/xcuserdata/\n"
             }
             if needsXptConfig {
                 updated += "\n# xpt — per-repo config\n"
@@ -95,23 +74,16 @@ struct Setup: ParsableCommand {
             }
         }
 
-        // Warn about already-tracked files that should be untracked
+        // Warn about already-tracked xcuserdata files that should be untracked
         let tracked = (try? GitUtilities.run("git", "ls-files", "--cached")) ?? ""
         let trackedLines = tracked.components(separatedBy: "\n")
-        let trackedBreakpoints = trackedLines.filter {
-            $0.hasSuffix("Breakpoints_v2.xcbkptlist") && $0.contains("xcuserdata/")
-        }
-        let hasTrackedXmarkConfig = trackedLines.contains(where: { $0 == ".xpt" })
+        let trackedXcuserdata = trackedLines.filter { $0.contains("xcuserdata/") }
+        let hasTrackedXptConfig = trackedLines.contains(where: { $0 == ".xpt" })
 
-        if !trackedBreakpoints.isEmpty || hasTrackedXmarkConfig {
+        if !trackedXcuserdata.isEmpty || hasTrackedXptConfig {
             var rmPaths: [String] = []
-            if trackedBreakpoints.contains(where: { $0.contains("xcdebugger/") }) {
-                rmPaths.append("'*/xcuserdata/*/xcdebugger/Breakpoints_v2.xcbkptlist'")
-            }
-            if trackedBreakpoints.contains(where: { !$0.contains("xcdebugger/") }) {
-                rmPaths.append("'*/xcuserdata/*/Breakpoints_v2.xcbkptlist'")
-            }
-            if hasTrackedXmarkConfig { rmPaths.append(".xpt") }
+            if !trackedXcuserdata.isEmpty { rmPaths.append("'*/xcuserdata/'") }
+            if hasTrackedXptConfig { rmPaths.append(".xpt") }
             print("""
             xpt: Some files xpt manages are tracked by git. Run this to untrack them:
 

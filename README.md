@@ -19,7 +19,7 @@ The breakpoint file location depends on your Xcode version:
 | Xcode 16+ | `MyApp.xcodeproj/xcuserdata/<user>.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist` |
 | Xcode 15 and earlier | `MyApp.xcodeproj/xcuserdata/<user>.xcuserdatad/Breakpoints_v2.xcbkptlist` |
 
-xpt detects which path is in use automatically — it checks for the `xcdebugger/` path first and falls back to the legacy path if it doesn't exist.
+xpt detects which path is in use automatically — it checks for the `xcdebugger/` path first and falls back to the legacy path. All of `xcuserdata/` is gitignored by `xpt setup`, so neither path ever appears in `git status`.
 
 > [!NOTE]
 > Because Xcode loads breakpoints at project-open time and does not watch the file for external changes, xpt uses AppleScript to close and reopen your project after each restore. This makes the new breakpoints appear immediately without any manual steps.
@@ -134,7 +134,7 @@ Installs a `post-checkout` git hook in the current repo and updates `.gitignore`
 xpt setup
 ```
 
-The gitignore entries are version-aware: xpt detects your installed Xcode and adds the appropriate path pattern (Xcode 16+ uses `xcdebugger/Breakpoints_v2.xcbkptlist`; earlier versions use the legacy path). If `xcodebuild` is unavailable, both patterns are added. Re-running `xpt setup` is safe — it won't add duplicate entries.
+xpt adds `**/xcuserdata/` to `.gitignore`, which covers breakpoints and all other per-user Xcode data (workspace state, interface layout, etc.). If a broader xcuserdata entry is already present, xpt skips adding a duplicate. Re-running `xpt setup` is safe — it won't add duplicate entries.
 
 If a `post-checkout` hook already exists (from Lefthook, Husky, etc.), xpt will not overwrite it. Instead, it prints the line you need to add manually:
 
