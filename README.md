@@ -66,7 +66,7 @@ Verify it worked:
 
 ```sh
 xpt --version
-# 0.1.0
+# 0.3.0
 ```
 
 ---
@@ -272,11 +272,11 @@ xpt stores snapshots in `~/.xpt/`, organized by repo and branch:
 ~/.xpt/
   <repo-identifier>/           # SHA-256 of the git remote URL (or repo path if no remote)
     main.xcbkptlist
-    feature__login.xcbkptlist  # '/' in branch names is stored as '__'
-    bugfix__crash.xcbkptlist
+    feature%2Flogin.xcbkptlist  # '/' in branch names is percent-encoded
+    bugfix%2Fcrash.xcbkptlist
 ```
 
-Snapshots are plain XML plist files — the same format Xcode uses. You can inspect them with any text editor.
+Snapshots are plain XML files — the same format Xcode uses. You can inspect them with any text editor.
 
 To remove all stored snapshots for a repo, delete its directory from `~/.xpt/`. To wipe everything:
 

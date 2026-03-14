@@ -5,7 +5,7 @@ struct Xpt: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "xpt",
         abstract: "Save and restore per-branch Xcode breakpoints.",
-        version: "0.2.0",
+        version: "0.3.0",
         subcommands: [
             Setup.self,
             Save.self,
