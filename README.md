@@ -1,5 +1,7 @@
 # xpt
 
+![Version](https://img.shields.io/badge/version-0.3.0-blue) ![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey) ![Swift](https://img.shields.io/badge/swift-6.1-orange) ![License](https://img.shields.io/badge/license-MIT-green)
+
 Save and restore per-branch Xcode breakpoints automatically.
 
 When you switch git branches, Xcode breakpoints stay anchored to line numbers from the wrong version of your code. xpt fixes this by hooking into `git checkout` to save your breakpoints before you leave a branch and restore them when you return.
@@ -14,12 +16,13 @@ The breakpoint file location depends on your Xcode version:
 
 | Xcode version | Breakpoint file path |
 |---|---|
-| Xcode 26+ | `MyApp.xcodeproj/xcuserdata/<user>.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist` |
+| Xcode 16+ | `MyApp.xcodeproj/xcuserdata/<user>.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist` |
 | Xcode 15 and earlier | `MyApp.xcodeproj/xcuserdata/<user>.xcuserdatad/Breakpoints_v2.xcbkptlist` |
 
 xpt detects which path is in use automatically — it checks for the `xcdebugger/` path first and falls back to the legacy path if it doesn't exist.
 
-Because Xcode loads breakpoints at project-open time and does not watch the file for external changes, xpt uses AppleScript to close and reopen your project after each restore. This makes the new breakpoints appear immediately without any manual steps.
+> [!NOTE]
+> Because Xcode loads breakpoints at project-open time and does not watch the file for external changes, xpt uses AppleScript to close and reopen your project after each restore. This makes the new breakpoints appear immediately without any manual steps.
 
 ---
 
@@ -35,32 +38,15 @@ Because Xcode loads breakpoints at project-open time and does not watch the file
 
 ### Build from source
 
-**First, make sure `xcode-select` points at your Xcode installation, not the standalone Command Line Tools:**
-
-```sh
-xcode-select -p
-```
-
-If the output is `/Library/Developer/CommandLineTools`, you need to switch it to Xcode (this is a one-time step):
-
-```sh
-sudo xcode-select --switch /Applications/Xcode.app
-```
-
-Replace `Xcode.app` with the name of your installed Xcode if it differs (e.g. `Xcode_26.3.app`). You can see what's in `/Applications` with:
-
-```sh
-ls /Applications | grep Xcode
-```
-
-Once `xcode-select` points at Xcode, build normally:
-
 ```sh
 git clone https://github.com/coveloper/xpt.git
 cd xpt
 swift build -c release
 cp .build/release/xpt /usr/local/bin/xpt
 ```
+
+> [!IMPORTANT]
+> `xcode-select` must point at your Xcode installation, not the standalone Command Line Tools. If `xcode-select -p` returns `/Library/Developer/CommandLineTools`, run `sudo xcode-select --switch /Applications/Xcode.app` first.
 
 Verify it worked:
 
