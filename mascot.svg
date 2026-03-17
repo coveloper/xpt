@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
+
+  <!-- Tail feathers (behind body) -->
+  <path d="M 84 157 C 58 172 38 188 26 218" stroke="#3498DB" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <path d="M 89 161 C 66 178 50 196 42 224" stroke="#F1C40F" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <path d="M 79 154 C 52 168 34 184 24 213" stroke="#E74C3C" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- Body -->
+  <ellipse cx="108" cy="138" rx="44" ry="52" fill="#2ECC71"/>
+
+  <!-- Wing panel -->
+  <path d="M 86 117 C 59 128 53 154 65 167 C 80 160 97 154 110 160" fill="#27AE60"/>
+  <path d="M 83 122 C 63 135 59 157 67 165" stroke="#1ABC9C" stroke-width="1.5" fill="none"/>
+
+  <!-- Neck join -->
+  <ellipse cx="115" cy="106" rx="20" ry="16" fill="#E74C3C"/>
+
+  <!-- Head -->
+  <circle cx="122" cy="82" r="30" fill="#E74C3C"/>
+
+  <!-- Crown crest feathers -->
+  <path d="M 113 54 C 110 40 116 27 112 18" stroke="#C0392B" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M 123 52 C 123 36 130 24 127 16" stroke="#E74C3C" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M 133 55 C 137 40 144 30 144 20" stroke="#C0392B" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- Crest tips -->
+  <circle cx="112" cy="18" r="4.5" fill="#F1C40F"/>
+  <circle cx="127" cy="16" r="4.5" fill="#F39C12"/>
+  <circle cx="144" cy="20" r="4" fill="#F1C40F"/>
+
+  <!-- Beak upper -->
+  <path d="M 149 77 C 163 73 170 80 164 88 C 157 89 149 86 149 77 Z" fill="#F39C12"/>
+  <!-- Beak lower -->
+  <path d="M 149 86 C 157 89 162 93 157 98 C 151 98 149 92 149 86 Z" fill="#E67E22"/>
+  <!-- Beak divider line -->
+  <path d="M 150 86 C 157 87 163 87 164 88" stroke="#D35400" stroke-width="1" fill="none"/>
+
+  <!-- Eye white -->
+  <circle cx="136" cy="76" r="11" fill="white"/>
+  <!-- Eye iris -->
+  <circle cx="138" cy="76" r="8" fill="#2C3E50"/>
+  <!-- Eye highlight -->
+  <circle cx="141" cy="73" r="3" fill="white"/>
+
+  <!-- Body chest highlight -->
+  <ellipse cx="120" cy="120" rx="14" ry="18" fill="#52D68A" opacity="0.45"/>
+
+  <!-- Branch -->
+  <path d="M 50 192 C 90 188 140 192 178 190" stroke="#7D5A0A" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <path d="M 52 189 C 92 185 142 189 176 187" stroke="#A07820" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+
+  <!-- Left foot -->
+  <line x1="94" y1="188" x2="94" y2="202" stroke="#6B4A08" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="94" y1="202" x2="83" y2="211" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
+  <line x1="94" y1="202" x2="94" y2="213" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
+  <line x1="94" y1="202" x2="105" y2="211" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Right foot -->
+  <line x1="116" y1="188" x2="116" y2="202" stroke="#6B4A08" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="116" y1="202" x2="105" y2="211" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
+  <line x1="116" y1="202" x2="116" y2="213" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
+  <line x1="116" y1="202" x2="127" y2="211" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Breakpoint marker (Xcode-style) on branch -->
+  <circle cx="168" cy="190" r="10" fill="#E74C3C" stroke="#C0392B" stroke-width="1.5"/>
+  <circle cx="168" cy="190" r="5.5" fill="white" opacity="0.2"/>
+
+</svg>
