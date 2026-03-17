@@ -1,67 +1,214 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280">
 
-  <!-- Tail feathers (behind body) -->
-  <path d="M 84 157 C 58 172 38 188 26 218" stroke="#3498DB" stroke-width="7" stroke-linecap="round" fill="none"/>
-  <path d="M 89 161 C 66 178 50 196 42 224" stroke="#F1C40F" stroke-width="7" stroke-linecap="round" fill="none"/>
-  <path d="M 79 154 C 52 168 34 184 24 213" stroke="#E74C3C" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <!-- ═══════════════════════════════
+       TAIL FEATHERS  (behind body)
+       ═══════════════════════════════ -->
 
-  <!-- Body -->
-  <ellipse cx="108" cy="138" rx="44" ry="52" fill="#2ECC71"/>
+  <!-- Teal feather -->
+  <path d="M 86 182 C 72 198 54 212 36 244"
+        stroke="#2CA8A8" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <!-- Yellow feather -->
+  <path d="M 93 186 C 82 204 66 220 52 252"
+        stroke="#F5C842" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <!-- Red feather -->
+  <path d="M 80 179 C 62 193 44 208 28 238"
+        stroke="#E8503A" stroke-width="10" stroke-linecap="round" fill="none"/>
 
-  <!-- Wing panel -->
-  <path d="M 86 117 C 59 128 53 154 65 167 C 80 160 97 154 110 160" fill="#27AE60"/>
-  <path d="M 83 122 C 63 135 59 157 67 165" stroke="#1ABC9C" stroke-width="1.5" fill="none"/>
+  <!-- Feather outlines (cartoon ink) -->
+  <path d="M 86 182 C 72 198 54 212 36 244"
+        stroke="#1A1A1A" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.55"/>
+  <path d="M 93 186 C 82 204 66 220 52 252"
+        stroke="#1A1A1A" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.55"/>
+  <path d="M 80 179 C 62 193 44 208 28 238"
+        stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55"/>
 
-  <!-- Neck join -->
-  <ellipse cx="115" cy="106" rx="20" ry="16" fill="#E74C3C"/>
+  <!-- ═══════════════════════════════
+       BODY
+       ═══════════════════════════════ -->
 
-  <!-- Head -->
-  <circle cx="122" cy="82" r="30" fill="#E74C3C"/>
+  <!-- Drop shadow -->
+  <ellipse cx="125" cy="162" rx="52" ry="55" fill="#2A7A2A" opacity="0.35"/>
 
-  <!-- Crown crest feathers -->
-  <path d="M 113 54 C 110 40 116 27 112 18" stroke="#C0392B" stroke-width="5" stroke-linecap="round" fill="none"/>
-  <path d="M 123 52 C 123 36 130 24 127 16" stroke="#E74C3C" stroke-width="5" stroke-linecap="round" fill="none"/>
-  <path d="M 133 55 C 137 40 144 30 144 20" stroke="#C0392B" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- Main body -->
+  <ellipse cx="120" cy="158" rx="52" ry="55" fill="#4DBF4D"/>
+
+  <!-- Chest / belly highlight -->
+  <ellipse cx="110" cy="148" rx="26" ry="32"
+           fill="#72D672" opacity="0.65"/>
+
+  <!-- Body outline -->
+  <ellipse cx="120" cy="158" rx="52" ry="55"
+           fill="none" stroke="#1A1A1A" stroke-width="3"/>
+
+  <!-- ═══════════════════════════════
+       WING
+       ═══════════════════════════════ -->
+
+  <!-- Wing fill -->
+  <path d="M 82 126 C 50 140 44 168 58 182 C 74 177 96 170 114 174 C 104 160 94 142 82 126 Z"
+        fill="#38A038"/>
+
+  <!-- Wing feather detail lines -->
+  <path d="M 77 130 C 57 147 54 170 62 180"
+        stroke="#5ABF5A" stroke-width="2" fill="none" opacity="0.8"/>
+  <path d="M 84 128 C 66 146 62 168 68 178"
+        stroke="#5ABF5A" stroke-width="2" fill="none" opacity="0.8"/>
+  <path d="M 91 128 C 76 146 72 168 76 178"
+        stroke="#5ABF5A" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+  <!-- Wing outline -->
+  <path d="M 82 126 C 50 140 44 168 58 182 C 74 177 96 170 114 174 C 104 160 94 142 82 126 Z"
+        fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- ═══════════════════════════════
+       NECK
+       ═══════════════════════════════ -->
+
+  <path d="M 105 110 C 96 118 96 132 106 138 C 116 140 132 136 136 124 C 136 114 122 106 105 110 Z"
+        fill="#E0402E" stroke="#1A1A1A" stroke-width="2.5"/>
+
+  <!-- ═══════════════════════════════
+       HEAD
+       ═══════════════════════════════ -->
+
+  <!-- Drop shadow -->
+  <circle cx="136" cy="93" r="43" fill="#B82C1C" opacity="0.35"/>
+
+  <!-- Main head -->
+  <circle cx="132" cy="89" r="43" fill="#E8503A"/>
+
+  <!-- Head highlight -->
+  <ellipse cx="118" cy="73" rx="18" ry="13" fill="#F07464" opacity="0.6"/>
+
+  <!-- Head outline -->
+  <circle cx="132" cy="89" r="43" fill="none" stroke="#1A1A1A" stroke-width="3"/>
+
+  <!-- ═══════════════════════════════
+       CREST FEATHERS
+       ═══════════════════════════════ -->
+
+  <!-- Back feather -->
+  <path d="M 116 50 C 112 36 118 22 114 10"
+        stroke="#C03020" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <!-- Tallest centre feather -->
+  <path d="M 130 46 C 130 28 136 14 132 4"
+        stroke="#E8503A" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <!-- Right feather -->
+  <path d="M 144 50 C 148 33 154 20 152 9"
+        stroke="#C03020" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <!-- Far-right small feather -->
+  <path d="M 154 56 C 160 42 166 30 164 19"
+        stroke="#B02818" stroke-width="5" stroke-linecap="round" fill="none"/>
+
+  <!-- Crest outlines -->
+  <path d="M 116 50 C 112 36 118 22 114 10"
+        stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
+  <path d="M 130 46 C 130 28 136 14 132 4"
+        stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+  <path d="M 144 50 C 148 33 154 20 152 9"
+        stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
+  <path d="M 154 56 C 160 42 166 30 164 19"
+        stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+
   <!-- Crest tips -->
-  <circle cx="112" cy="18" r="4.5" fill="#F1C40F"/>
-  <circle cx="127" cy="16" r="4.5" fill="#F39C12"/>
-  <circle cx="144" cy="20" r="4" fill="#F1C40F"/>
+  <circle cx="114" cy="10" r="6" fill="#F5C842" stroke="#1A1A1A" stroke-width="2"/>
+  <circle cx="132" cy="4"  r="7" fill="#F5C842" stroke="#1A1A1A" stroke-width="2"/>
+  <circle cx="152" cy="9"  r="5.5" fill="#F5C842" stroke="#1A1A1A" stroke-width="2"/>
+  <circle cx="164" cy="19" r="4.5" fill="#F5A620" stroke="#1A1A1A" stroke-width="1.5"/>
 
-  <!-- Beak upper -->
-  <path d="M 149 77 C 163 73 170 80 164 88 C 157 89 149 86 149 77 Z" fill="#F39C12"/>
-  <!-- Beak lower -->
-  <path d="M 149 86 C 157 89 162 93 157 98 C 151 98 149 92 149 86 Z" fill="#E67E22"/>
+  <!-- ═══════════════════════════════
+       BEAK
+       ═══════════════════════════════ -->
+
+  <!-- Upper beak -->
+  <path d="M 170 84 C 188 76 198 85 192 97 C 184 102 170 96 170 84 Z"
+        fill="#F5A620" stroke="#1A1A1A" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Lower beak -->
+  <path d="M 170 96 C 179 100 186 105 180 113 C 172 114 169 105 170 96 Z"
+        fill="#D4800E" stroke="#1A1A1A" stroke-width="2.5" stroke-linejoin="round"/>
   <!-- Beak divider line -->
-  <path d="M 150 86 C 157 87 163 87 164 88" stroke="#D35400" stroke-width="1" fill="none"/>
+  <path d="M 172 96 C 181 97 190 97 192 97"
+        stroke="#8B5500" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <!-- Beak highlight -->
+  <path d="M 173 83 C 180 79 187 82"
+        stroke="#FFD878" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.9"/>
 
-  <!-- Eye white -->
-  <circle cx="136" cy="76" r="11" fill="white"/>
-  <!-- Eye iris -->
-  <circle cx="138" cy="76" r="8" fill="#2C3E50"/>
-  <!-- Eye highlight -->
-  <circle cx="141" cy="73" r="3" fill="white"/>
+  <!-- ═══════════════════════════════
+       EYE
+       ═══════════════════════════════ -->
 
-  <!-- Body chest highlight -->
-  <ellipse cx="120" cy="120" rx="14" ry="18" fill="#52D68A" opacity="0.45"/>
+  <!-- Eye socket (white) -->
+  <circle cx="154" cy="82" r="15" fill="white" stroke="#1A1A1A" stroke-width="2.5"/>
+  <!-- Orange iris ring -->
+  <circle cx="154" cy="82" r="12" fill="#F5A620"/>
+  <!-- Dark iris / pupil -->
+  <circle cx="154" cy="82" r="9" fill="#1A2A3A"/>
+  <!-- Pupil gloss -->
+  <circle cx="154" cy="82" r="6" fill="#2A3E52"/>
+  <!-- Primary shine -->
+  <circle cx="159" cy="77" r="4"   fill="white"/>
+  <!-- Secondary shine -->
+  <circle cx="150" cy="87" r="2"   fill="white" opacity="0.65"/>
 
-  <!-- Branch -->
-  <path d="M 50 192 C 90 188 140 192 178 190" stroke="#7D5A0A" stroke-width="11" stroke-linecap="round" fill="none"/>
-  <path d="M 52 189 C 92 185 142 189 176 187" stroke="#A07820" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+  <!-- ═══════════════════════════════
+       BRANCH
+       ═══════════════════════════════ -->
 
-  <!-- Left foot -->
-  <line x1="94" y1="188" x2="94" y2="202" stroke="#6B4A08" stroke-width="2.5" stroke-linecap="round"/>
-  <line x1="94" y1="202" x2="83" y2="211" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
-  <line x1="94" y1="202" x2="94" y2="213" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
-  <line x1="94" y1="202" x2="105" y2="211" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
+  <!-- Branch shadow -->
+  <path d="M 34 226 C 90 224 162 228 214 225"
+        stroke="#3A2005" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.4"/>
+  <!-- Main branch body -->
+  <path d="M 32 222 C 88 220 160 224 212 221"
+        stroke="#8B5E1A" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <!-- Branch highlight -->
+  <path d="M 36 216 C 90 214 160 218 210 215"
+        stroke="#B07E38" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <!-- Branch texture -->
+  <path d="M 60 223 C 80 220 105 223"
+        stroke="#5A3A0A" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M 138 224 C 158 221 180 224"
+        stroke="#5A3A0A" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <!-- Branch outline -->
+  <path d="M 32 222 C 88 220 160 224 212 221"
+        stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
 
-  <!-- Right foot -->
-  <line x1="116" y1="188" x2="116" y2="202" stroke="#6B4A08" stroke-width="2.5" stroke-linecap="round"/>
-  <line x1="116" y1="202" x2="105" y2="211" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
-  <line x1="116" y1="202" x2="116" y2="213" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
-  <line x1="116" y1="202" x2="127" y2="211" stroke="#6B4A08" stroke-width="2" stroke-linecap="round"/>
+  <!-- ═══════════════════════════════
+       FEET
+       ═══════════════════════════════ -->
 
-  <!-- Breakpoint marker (Xcode-style) on branch -->
-  <circle cx="168" cy="190" r="10" fill="#E74C3C" stroke="#C0392B" stroke-width="1.5"/>
-  <circle cx="168" cy="190" r="5.5" fill="white" opacity="0.2"/>
+  <!-- Left leg -->
+  <line x1="96"  y1="210" x2="96"  y2="226" stroke="#8B5E1A" stroke-width="4" stroke-linecap="round"/>
+  <!-- Left toes -->
+  <path d="M 96 226 C 88 230 80 236 76 240" stroke="#8B5E1A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M 96 226 C 94 232 93 238 92 244"  stroke="#8B5E1A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M 96 226 C 104 230 112 234 116 238" stroke="#8B5E1A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <!-- Left claw tips -->
+  <circle cx="76"  cy="240" r="2.5" fill="#3A2005"/>
+  <circle cx="92"  cy="244" r="2.5" fill="#3A2005"/>
+  <circle cx="116" cy="238" r="2.5" fill="#3A2005"/>
+
+  <!-- Right leg -->
+  <line x1="120" y1="210" x2="120" y2="226" stroke="#8B5E1A" stroke-width="4" stroke-linecap="round"/>
+  <!-- Right toes -->
+  <path d="M 120 226 C 112 230 104 236 100 240" stroke="#8B5E1A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M 120 226 C 118 232 117 238 116 244"  stroke="#8B5E1A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M 120 226 C 128 230 136 234 140 238" stroke="#8B5E1A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <!-- Right claw tips -->
+  <circle cx="100" cy="240" r="2.5" fill="#3A2005"/>
+  <circle cx="116" cy="244" r="2.5" fill="#3A2005"/>
+  <circle cx="140" cy="238" r="2.5" fill="#3A2005"/>
+
+  <!-- Leg outlines -->
+  <line x1="96"  y1="210" x2="96"  y2="226" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="120" y1="210" x2="120" y2="226" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- ═══════════════════════════════
+       BREAKPOINT MARKER
+       (Xcode-style red dot on branch)
+       ═══════════════════════════════ -->
+
+  <circle cx="196" cy="221" r="12" fill="#E74C3C" stroke="#1A1A1A" stroke-width="2.5"/>
+  <circle cx="196" cy="221" r="7"  fill="#FF7070" opacity="0.45"/>
+  <circle cx="193" cy="218" r="3"  fill="white" opacity="0.55"/>
 
 </svg>
