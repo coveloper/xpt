@@ -1,15 +1,17 @@
 import ArgumentParser
 import Foundation
 
-struct Delete: ParsableCommand {
-    static let configuration = CommandConfiguration(
+public struct Delete: ParsableCommand {
+    public static let configuration = CommandConfiguration(
         abstract: "Remove the saved breakpoint set for a branch."
     )
 
     @Argument(help: "The branch whose saved breakpoints should be deleted.")
-    var branch: String
+    public var branch: String
 
-    func run() throws {
+    public init() {}
+
+    public func run() throws {
         let repoRoot = try GitUtilities.repoRoot()
         let storage = try StorageManager(repoRoot: repoRoot)
 

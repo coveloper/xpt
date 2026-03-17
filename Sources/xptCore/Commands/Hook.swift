@@ -1,26 +1,28 @@
 import ArgumentParser
 import Foundation
 
-struct Hook: ParsableCommand {
-    static let configuration = CommandConfiguration(
+public struct Hook: ParsableCommand {
+    public static let configuration = CommandConfiguration(
         commandName: "_hook",
         abstract: "Internal: called by the git post-checkout hook.",
         shouldDisplay: false
     )
 
     @Argument(help: "Hook name (e.g. post-checkout)")
-    var hookName: String
+    public var hookName: String
 
     @Argument(help: "Previous HEAD ref or SHA")
-    var prevHead: String
+    public var prevHead: String
 
     @Argument(help: "New HEAD ref or SHA")
-    var newHead: String
+    public var newHead: String
 
     @Argument(help: "Branch switch flag: 1 = branch switch, 0 = file checkout")
-    var flag: String
+    public var flag: String
 
-    func run() throws {
+    public init() {}
+
+    public mutating func run() throws {
         // Only act on branch switches, not file checkouts
         guard flag == "1" else { return }
 
@@ -64,6 +66,17 @@ struct Hook: ParsableCommand {
 
     // MARK: - Previous branch resolution
 
+    /// Parses the previous branch name from a reflog entry of the form
+    /// "checkout: moving from <prev> to <new>", excluding `currentBranch`.
+    /// Returns nil if the entry is malformed or if prev equals currentBranch.
+    static func parsePreviousBranch(fromReflogEntry entry: String, excluding currentBranch: String) -> String? {
+        guard entry.hasPrefix("checkout: moving from ") else { return nil }
+        let rest = String(entry.dropFirst("checkout: moving from ".count))
+        guard let prev = rest.components(separatedBy: " to ").first,
+              !prev.isEmpty, prev != currentBranch else { return nil }
+        return prev
+    }
+
     /// Resolves the branch name for the branch we just left, excluding `currentBranch`.
     /// Returns nil if the branch cannot be reliably determined (non-fatal).
     private func resolvePreviousBranch(sha: String, excluding currentBranch: String) -> String? {
@@ -71,12 +84,8 @@ struct Hook: ParsableCommand {
         // checkout as "checkout: moving from <prev> to <new>", giving us the exact
         // branch names regardless of how many branches share the same SHA.
         if let entry = try? GitUtilities.run("git", "reflog", "-1", "HEAD", "--format=%gs"),
-           entry.hasPrefix("checkout: moving from ") {
-            let rest = String(entry.dropFirst("checkout: moving from ".count))
-            if let prev = rest.components(separatedBy: " to ").first,
-               !prev.isEmpty, prev != currentBranch {
-                return prev
-            }
+           let prev = Self.parsePreviousBranch(fromReflogEntry: entry, excluding: currentBranch) {
+            return prev
         }
 
         // Fallback: ask git which local branches point to this SHA. Only reliable

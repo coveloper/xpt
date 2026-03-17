@@ -1,9 +1,9 @@
 import Foundation
 
-enum XcodeUtilities {
+public enum XcodeUtilities {
     // MARK: - Running check
 
-    static var isRunning: Bool {
+    public static var isRunning: Bool {
         let result = try? GitUtilities.run("pgrep", "-x", "Xcode")
         return result != nil && !result!.isEmpty
     }
@@ -15,7 +15,7 @@ enum XcodeUtilities {
     ///
     /// Returns true if the reload was attempted, false if Xcode wasn't running.
     @discardableResult
-    static func reloadProject(projectURL: URL) -> Bool {
+    public static func reloadProject(projectURL: URL) -> Bool {
         guard isRunning else { return false }
 
         // Escape the path for safe embedding in an AppleScript string literal.
@@ -58,7 +58,7 @@ enum XcodeUtilities {
 
     /// Wraps a string in an AppleScript string expression, safely handling embedded
     /// double-quote characters by using AppleScript's `quote` constant.
-    private static func escapeForAppleScript(_ string: String) -> String {
+    static func escapeForAppleScript(_ string: String) -> String {
         let parts = string.components(separatedBy: "\"")
         guard parts.count > 1 else { return "\"\(string)\"" }
         return "\"" + parts.joined(separator: "\" & quote & \"") + "\""

@@ -1,15 +1,17 @@
 import ArgumentParser
 import Foundation
 
-struct Setup: ParsableCommand {
-    static let configuration = CommandConfiguration(
+public struct Setup: ParsableCommand {
+    public static let configuration = CommandConfiguration(
         abstract: "Install the post-checkout git hook into the current repo."
     )
 
-    static let hookSnippet = #"xpt _hook post-checkout "$1" "$2" "$3""#
-    static let hookScript = "#!/bin/sh\n\(hookSnippet)\n"
+    public static let hookSnippet = #"xpt _hook post-checkout "$1" "$2" "$3""#
+    public static let hookScript = "#!/bin/sh\n\(hookSnippet)\n"
 
-    func run() throws {
+    public init() {}
+
+    public func run() throws {
         let repoRoot = try GitUtilities.repoRoot()
 
         // 1. Always manage .gitignore (idempotent)

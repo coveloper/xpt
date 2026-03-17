@@ -1,11 +1,11 @@
 import Foundation
 
-enum GitError: Error, CustomStringConvertible {
+public enum GitError: Error, CustomStringConvertible {
     case notAGitRepo
     case commandFailed(String)
     case branchNotFound(String)
 
-    var description: String {
+    public var description: String {
         switch self {
         case .notAGitRepo:
             return "Not inside a git repository."
@@ -17,24 +17,24 @@ enum GitError: Error, CustomStringConvertible {
     }
 }
 
-enum GitUtilities {
+public enum GitUtilities {
     // MARK: - Repo Root
 
-    static func repoRoot() throws -> URL {
+    public static func repoRoot() throws -> URL {
         let output = try run("git", "rev-parse", "--show-toplevel")
         return URL(fileURLWithPath: output)
     }
 
     // MARK: - Current Branch
 
-    static func currentBranch() throws -> String {
+    public static func currentBranch() throws -> String {
         return try run("git", "symbolic-ref", "--short", "HEAD")
     }
 
     // MARK: - Branch from ref/SHA
 
     /// Resolves a branch name from a full ref or SHA (as passed by git hooks).
-    static func branchName(for ref: String) throws -> String {
+    public static func branchName(for ref: String) throws -> String {
         // Try symbolic ref first (works when ref is a branch tip)
         if let name = try? run("git", "name-rev", "--name-only", "--no-undefined", ref),
            !name.isEmpty {
@@ -48,14 +48,14 @@ enum GitUtilities {
 
     // MARK: - Remote URL
 
-    static func remoteURL(remote: String = "origin") -> String? {
+    public static func remoteURL(remote: String = "origin") -> String? {
         return try? run("git", "remote", "get-url", remote)
     }
 
     // MARK: - Shell runner
 
     @discardableResult
-    static func run(_ args: String...) throws -> String {
+    public static func run(_ args: String...) throws -> String {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         process.arguments = args

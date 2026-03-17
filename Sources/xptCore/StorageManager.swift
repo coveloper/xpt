@@ -1,13 +1,13 @@
 import Foundation
 import CryptoKit
 
-enum StorageError: Error, CustomStringConvertible {
+public enum StorageError: Error, CustomStringConvertible {
     case noSnapshotFound(String)
     case symlinkDetected(String)
     case invalidBranchName(String)
     case invalidSnapshot(String)
 
-    var description: String {
+    public var description: String {
         switch self {
         case .noSnapshotFound(let branch):
             return "No saved breakpoints found for branch '\(branch)'."
@@ -21,12 +21,12 @@ enum StorageError: Error, CustomStringConvertible {
     }
 }
 
-struct StorageManager {
-    let repoDirectory: URL
+public struct StorageManager {
+    public let repoDirectory: URL
 
     // MARK: - Init
 
-    init(repoRoot: URL) throws {
+    public init(repoRoot: URL) throws {
         let identifier = Self.repoIdentifier(repoRoot: repoRoot)
         self.repoDirectory = URL(fileURLWithPath: NSHomeDirectory())
             .appendingPathComponent(".xpt")
@@ -35,10 +35,10 @@ struct StorageManager {
 
     // MARK: - Repo identifier
 
-    private static func repoIdentifier(repoRoot: URL) -> String {
+    static func repoIdentifier(repoRoot: URL) -> String {
         let key: String
         if let remote = GitUtilities.remoteURL() {
-            key = normalizeRemoteURL(remote)
+            key = Self.normalizeRemoteURL(remote)
         } else {
             key = repoRoot.standardizedFileURL.path
         }
@@ -46,7 +46,7 @@ struct StorageManager {
         return digest.map { String(format: "%02x", $0) }.joined()
     }
 
-    private static func normalizeRemoteURL(_ url: String) -> String {
+    static func normalizeRemoteURL(_ url: String) -> String {
         // Strip trailing .git and lowercase for stable hashing
         var normalized = url.lowercased()
         if normalized.hasSuffix(".git") {
@@ -57,16 +57,16 @@ struct StorageManager {
 
     // MARK: - Snapshot URL
 
-    func snapshotURL(for branch: String) -> URL {
+    public func snapshotURL(for branch: String) -> URL {
         // Branch names can contain '/' — use path components naturally
-        let sanitized = sanitize(branch)
+        let sanitized = Self.sanitize(branch)
         return repoDirectory.appendingPathComponent(sanitized + ".xcbkptlist")
     }
 
     // MARK: - Save / Restore / Delete
 
-    func save(from sourceURL: URL, branch: String) throws {
-        try validateBranchName(branch)
+    public func save(from sourceURL: URL, branch: String) throws {
+        try Self.validateBranchName(branch)
         let dest = snapshotURL(for: branch)
         try ensureParentDirectory(for: dest)
         // Refuse to overwrite a symlink in the storage directory. A symlink placed
@@ -78,8 +78,8 @@ struct StorageManager {
         try FileManager.default.copyItem(at: sourceURL, to: dest)
     }
 
-    func restore(to destinationURL: URL, branch: String) throws {
-        try validateBranchName(branch)
+    public func restore(to destinationURL: URL, branch: String) throws {
+        try Self.validateBranchName(branch)
         let source = snapshotURL(for: branch)
         guard FileManager.default.fileExists(atPath: source.path) else {
             throw StorageError.noSnapshotFound(branch)
@@ -91,7 +91,7 @@ struct StorageManager {
             throw StorageError.symlinkDetected(source.path)
         }
         // Validate the snapshot is a well-formed plist before overwriting the live file.
-        try validatePlistFile(at: source)
+        try Self.validatePlistFile(at: source)
         try ensureParentDirectory(for: destinationURL)
         // Refuse to overwrite a symlink at the destination. A symlink placed at the
         // breakpoint file location could redirect the write to an arbitrary file.
@@ -102,8 +102,8 @@ struct StorageManager {
         try FileManager.default.copyItem(at: source, to: destinationURL)
     }
 
-    func delete(branch: String) throws {
-        try validateBranchName(branch)
+    public func delete(branch: String) throws {
+        try Self.validateBranchName(branch)
         let url = snapshotURL(for: branch)
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw StorageError.noSnapshotFound(branch)
@@ -111,7 +111,7 @@ struct StorageManager {
         try FileManager.default.removeItem(at: url)
     }
 
-    func clearBreakpoints(at destinationURL: URL) throws {
+    public func clearBreakpoints(at destinationURL: URL) throws {
         try ensureParentDirectory(for: destinationURL)
         // Refuse to overwrite a symlink at the destination (same protection as restore()).
         if Self.isSymlink(at: destinationURL) {
@@ -135,12 +135,12 @@ struct StorageManager {
 
     // MARK: - Listing
 
-    struct SnapshotInfo {
-        let branch: String
-        let modifiedDate: Date
+    public struct SnapshotInfo {
+        public let branch: String
+        public let modifiedDate: Date
     }
 
-    func allSnapshots() throws -> [SnapshotInfo] {
+    public func allSnapshots() throws -> [SnapshotInfo] {
         let fm = FileManager.default
         guard fm.fileExists(atPath: repoDirectory.path) else { return [] }
 
@@ -155,7 +155,7 @@ struct StorageManager {
             .map { url in
                 let attrs = try url.resourceValues(forKeys: [.contentModificationDateKey])
                 let date = attrs.contentModificationDate ?? Date.distantPast
-                let branch = unsanitize(url.deletingPathExtension().lastPathComponent)
+                let branch = Self.unsanitize(url.deletingPathExtension().lastPathComponent)
                 return SnapshotInfo(branch: branch, modifiedDate: date)
             }
             .sorted { $0.modifiedDate > $1.modifiedDate }
@@ -170,24 +170,33 @@ struct StorageManager {
         )
     }
 
-    /// Verifies that the file at `url` is well-formed XML.
-    /// Prevents restoring corrupted or malformed snapshots over the live breakpoint file.
-    ///
-    /// Xcode breakpoint files use a `<Bucket>` root element, not a `<plist>` root, so
-    /// PropertyListSerialization cannot be used here. XMLDocument is the right validator.
-    private func validatePlistFile(at url: URL) throws {
+    /// Validates that the file at `url` is a well-formed Xcode breakpoint XML document.
+    static func validatePlistFile(at url: URL) throws {
         let data = try Data(contentsOf: url)
+        try validateXML(data: data)
+    }
+
+    /// Validates that `data` is well-formed XML with a `<Bucket>` root element.
+    /// Empty data, non-XML bytes, and documents without a `<Bucket>` root are rejected.
+    static func validateXML(data: Data) throws {
+        guard !data.isEmpty else {
+            throw StorageError.invalidSnapshot("<empty data>")
+        }
+        let doc: XMLDocument
         do {
-            _ = try XMLDocument(data: data, options: [])
+            doc = try XMLDocument(data: data, options: [])
         } catch {
-            throw StorageError.invalidSnapshot(url.path)
+            throw StorageError.invalidSnapshot("<invalid xml>")
+        }
+        guard doc.rootElement()?.name == "Bucket" else {
+            throw StorageError.invalidSnapshot("<not a Bucket document>")
         }
     }
 
     /// Validates that `branch` is safe to use as a storage key.
     /// Rejects empty strings, null bytes, and newlines — characters that could
     /// corrupt filesystem paths or git command arguments.
-    private func validateBranchName(_ branch: String) throws {
+    static func validateBranchName(_ branch: String) throws {
         guard !branch.isEmpty,
               !branch.contains("\0"),
               !branch.contains("\n") else {
@@ -197,7 +206,7 @@ struct StorageManager {
 
     /// Returns true if the item at `url` exists and is a symbolic link.
     /// Uses lstat-level attribute inspection, which does not follow the symlink.
-    private static func isSymlink(at url: URL) -> Bool {
+    static func isSymlink(at url: URL) -> Bool {
         guard let attrs = try? FileManager.default.attributesOfItem(atPath: url.path) else {
             return false
         }
@@ -216,13 +225,13 @@ struct StorageManager {
     ///
     /// This encoding is bijective: distinct branch names always produce distinct
     /// filenames, and unsanitize() is an exact inverse.
-    private func sanitize(_ branch: String) -> String {
+    static func sanitize(_ branch: String) -> String {
         branch
             .replacingOccurrences(of: "%", with: "%25")
             .replacingOccurrences(of: "/", with: "%2F")
     }
 
-    private func unsanitize(_ filename: String) -> String {
+    static func unsanitize(_ filename: String) -> String {
         filename.removingPercentEncoding ?? filename
     }
 }
