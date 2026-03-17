@@ -8,12 +8,22 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
     ],
     targets: [
-        .executableTarget(
-            name: "xpt",
+        .target(
+            name: "xptCore",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ],
+            path: "Sources/xptCore"
+        ),
+        .executableTarget(
+            name: "xpt",
+            dependencies: ["xptCore"],
             path: "Sources/xpt"
+        ),
+        .testTarget(
+            name: "xptTests",
+            dependencies: ["xptCore"],
+            path: "Tests/xptTests"
         ),
     ]
 )

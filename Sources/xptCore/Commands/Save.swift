@@ -1,15 +1,17 @@
 import ArgumentParser
 import Foundation
 
-struct Save: ParsableCommand {
-    static let configuration = CommandConfiguration(
+public struct Save: ParsableCommand {
+    public static let configuration = CommandConfiguration(
         abstract: "Save current breakpoints for the current (or named) branch."
     )
 
     @Option(name: .long, help: "Branch name to save as. Defaults to current branch.")
-    var branch: String?
+    public var branch: String?
 
-    func run() throws {
+    public init() {}
+
+    public func run() throws {
         let repoRoot = try GitUtilities.repoRoot()
         let config = try RepoConfig.load(from: repoRoot)
         let projectURL = try PathUtilities.projectURL(repoRoot: repoRoot, configuredProject: config.project)

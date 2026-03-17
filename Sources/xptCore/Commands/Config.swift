@@ -1,15 +1,17 @@
 import ArgumentParser
 import Foundation
 
-struct Config: ParsableCommand {
-    static let configuration = CommandConfiguration(
+public struct Config: ParsableCommand {
+    public static let configuration = CommandConfiguration(
         abstract: "Display or edit the repo-level .xpt configuration."
     )
 
     @Option(name: .long, help: "Set a config value, e.g. --set onEmptyBranch=preserve")
-    var set: String?
+    public var set: String?
 
-    func run() throws {
+    public init() {}
+
+    public func run() throws {
         let repoRoot = try GitUtilities.repoRoot()
         var config = try RepoConfig.load(from: repoRoot)
 
