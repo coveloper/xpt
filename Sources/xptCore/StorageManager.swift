@@ -118,6 +118,12 @@ public struct StorageManager {
         guard FileManager.default.fileExists(atPath: oldURL.path) else {
             throw StorageError.noSnapshotFound(oldBranch)
         }
+        if Self.isSymlink(at: oldURL) {
+            throw StorageError.symlinkDetected(oldURL.path)
+        }
+        if Self.isSymlink(at: newURL) {
+            throw StorageError.symlinkDetected(newURL.path)
+        }
         if FileManager.default.fileExists(atPath: newURL.path) {
             throw StorageError.snapshotAlreadyExists(newBranch)
         }

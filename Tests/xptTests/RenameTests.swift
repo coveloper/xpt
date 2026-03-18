@@ -97,6 +97,37 @@ struct RenameTests {
         }
     }
 
+    @Test("Symlink at old path — throws symlinkDetected")
+    func symlinkAtOldPath() throws {
+        let (storage, tmp) = try makeStorage()
+        let oldURL = storage.snapshotURL(for: "feature/old")
+        // Create a real file to be the symlink target, then symlink to it
+        let target = tmp.appendingPathComponent("real.xcbkptlist")
+        try minimalSnapshot.write(to: target)
+        try FileManager.default.createSymbolicLink(at: oldURL, withDestinationURL: target)
+
+        #expect(throws: StorageError.symlinkDetected(oldURL.path)) {
+            try storage.rename(from: "feature/old", to: "feature/new")
+        }
+    }
+
+    @Test("Symlink at new path — throws symlinkDetected")
+    func symlinkAtNewPath() throws {
+        let (storage, tmp) = try makeStorage()
+        // Create a real old snapshot
+        let oldURL = storage.snapshotURL(for: "feature/old")
+        try minimalSnapshot.write(to: oldURL)
+        // Place a symlink at the new path
+        let target = tmp.appendingPathComponent("real.xcbkptlist")
+        try minimalSnapshot.write(to: target)
+        let newURL = storage.snapshotURL(for: "feature/new")
+        try FileManager.default.createSymbolicLink(at: newURL, withDestinationURL: target)
+
+        #expect(throws: StorageError.symlinkDetected(newURL.path)) {
+            try storage.rename(from: "feature/old", to: "feature/new")
+        }
+    }
+
     @Test("Renamed snapshot content is preserved")
     func contentPreserved() throws {
         let (storage, _) = try makeStorage()
