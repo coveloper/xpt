@@ -1,11 +1,12 @@
 import Foundation
 import CryptoKit
 
-public enum StorageError: Error, CustomStringConvertible {
+public enum StorageError: Error, CustomStringConvertible, Equatable {
     case noSnapshotFound(String)
     case symlinkDetected(String)
     case invalidBranchName(String)
     case invalidSnapshot(String)
+    case snapshotAlreadyExists(String)
 
     public var description: String {
         switch self {
@@ -17,6 +18,8 @@ public enum StorageError: Error, CustomStringConvertible {
             return "Invalid branch name '\(branch)': must not be empty or contain null bytes or newlines."
         case .invalidSnapshot(let path):
             return "Snapshot at '\(path)' is not a valid plist file and will not be restored. Delete it with 'xpt delete' and re-save if needed."
+        case .snapshotAlreadyExists(let branch):
+            return "A snapshot already exists for branch '\(branch)'. Delete it first with 'xpt delete \(branch)'."
         }
     }
 }
@@ -31,6 +34,11 @@ public struct StorageManager {
         self.repoDirectory = URL(fileURLWithPath: NSHomeDirectory())
             .appendingPathComponent(".xpt")
             .appendingPathComponent(identifier)
+    }
+
+    /// Internal initializer for testing — injects a custom storage directory.
+    init(repoDirectory: URL) {
+        self.repoDirectory = repoDirectory
     }
 
     // MARK: - Repo identifier
@@ -100,6 +108,20 @@ public struct StorageManager {
         }
         try? FileManager.default.removeItem(at: destinationURL)
         try FileManager.default.copyItem(at: source, to: destinationURL)
+    }
+
+    public func rename(from oldBranch: String, to newBranch: String) throws {
+        try Self.validateBranchName(oldBranch)
+        try Self.validateBranchName(newBranch)
+        let oldURL = snapshotURL(for: oldBranch)
+        let newURL = snapshotURL(for: newBranch)
+        guard FileManager.default.fileExists(atPath: oldURL.path) else {
+            throw StorageError.noSnapshotFound(oldBranch)
+        }
+        if FileManager.default.fileExists(atPath: newURL.path) {
+            throw StorageError.snapshotAlreadyExists(newBranch)
+        }
+        try FileManager.default.moveItem(at: oldURL, to: newURL)
     }
 
     public func delete(branch: String) throws {

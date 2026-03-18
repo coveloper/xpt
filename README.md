@@ -212,6 +212,20 @@ xpt delete feature/old-branch
 
 ---
 
+### `xpt rename`
+
+Renames a saved breakpoint snapshot to match a renamed branch.
+
+Use this after running `git branch -m <old> <new>` to keep your saved breakpoints reachable under the new branch name.
+
+```sh
+xpt rename feature/old-name feature/new-name
+```
+
+If no snapshot exists for `<old>`, xpt exits with an error. If a snapshot already exists for `<new>`, xpt exits with an error — delete it first with `xpt delete <new>` if you want to overwrite.
+
+---
+
 ### `xpt config`
 
 Displays or sets per-repo configuration.

@@ -13,6 +13,7 @@ struct Xpt: ParsableCommand {
             Restore.self,
             List.self,
             Delete.self,
+            Rename.self,
             Config.self,
             Hook.self,
         ]
